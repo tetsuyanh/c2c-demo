@@ -1,0 +1,5 @@
+[postgres]
+dbUser = "c2c_demo"
+dbPassword = ""
+dbHost = "localhost"
+dbName = "c2c_demo"

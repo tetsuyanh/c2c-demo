@@ -24,3 +24,15 @@
 [[constraint]]
   name = "github.com/gin-gonic/gin"
   version = "1.2.0"
+
+[[constraint]]
+  name = "github.com/go-gorp/gorp"
+  version = "2.1.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/lib/pq"
+
+[[constraint]]
+  name = "github.com/spf13/viper"
+  version = "1.1.0"
