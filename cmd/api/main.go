@@ -15,7 +15,7 @@ import (
 
 	"github.com/tetsuyanh/c2c-demo/cmd/api/v1"
 	"github.com/tetsuyanh/c2c-demo/conf"
-	"github.com/tetsuyanh/c2c-demo/repo"
+	"github.com/tetsuyanh/c2c-demo/repository"
 )
 
 const (
@@ -38,11 +38,15 @@ func run(args []string) int {
 		return exitError
 	}
 
-	if eRepo := repo.Setup(c.Postgres); eRepo != nil {
-		log.Printf("repo setup error: %s\n", eRepo)
+	if eRepo := repository.Setup(c.Postgres); eRepo != nil {
+		log.Printf("repository setup error: %s\n", eRepo)
 		return exitError
 	}
-	defer repo.TearDown()
+	defer repository.TearDown()
+
+	if eV1 := v1.Setup(); eV1 != nil {
+		log.Printf("v1 setup error: %s\n", eV1)
+	}
 
 	g := gin.Default()
 	// for healthe-check

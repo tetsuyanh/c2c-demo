@@ -1,4 +1,4 @@
-package repo
+package repository
 
 import (
 	"database/sql"
@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/tetsuyanh/c2c-demo/conf"
+	"github.com/tetsuyanh/c2c-demo/model"
 )
 
 var (
@@ -36,7 +37,9 @@ func Setup(c conf.Postgres) error {
 	}
 
 	models := make(map[string]interface{}, 64)
-	// models[UserRepoName] = model.User{}
+	models[UserTableName] = model.User{}
+	models[SessionTableName] = model.Session{}
+	models[AuthenticationTableName] = model.Authentication{}
 	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 	for k, v := range models {
 		dbMap.AddTableWithName(v, k).SetKeys(false, "id")
@@ -56,4 +59,18 @@ func TearDown() {
 		repo.db = nil
 		repo = nil
 	}
+}
+
+func resultExec(result sql.Result, err error) error {
+	if err != nil {
+		return fmt.Errorf("query error: %s", err)
+	}
+	// see: https://golang.org/pkg/database/sql/#Result
+	// Not every database or database driver may support this.
+	if cnt, errRow := result.RowsAffected(); errRow != nil {
+		return fmt.Errorf("result.RowsAffected: %s", errRow)
+	} else if cnt == 0 {
+		return fmt.Errorf("query no target")
+	}
+	return nil
 }
