@@ -35,7 +35,7 @@ func handlerPostAuthPublish(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	a, err := userSrv.CreateAuth(c.GetString(AuthenticatedUserID), req.EMail, req.Password)
+	a, err := userSrv.CreateAuth(c.GetString(requestUserID), req.EMail, req.Password)
 	if err != nil {
 		log.Printf("userSrv.CreateAuth: %v\n", err)
 		c.AbortWithError(http.StatusInternalServerError, err)

@@ -34,3 +34,18 @@ CREATE TABLE assets (
 );
 CREATE INDEX assets_created_at_key ON assets (created_at);
 
+CREATE TYPE item_status AS ENUM ('notsold', 'sold', 'soldout');
+
+CREATE TABLE items (
+  id CHAR(10) PRIMARY KEY,
+  user_id CHAR(10) REFERENCES users(id) NOT NULL,
+  label VARCHAR(64) NOT NULL,
+  description VARCHAR(256),
+  price INT NOT NULL,
+  status item_status NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT current_timestamp,
+  updated_at TIMESTAMPTZ DEFAULT current_timestamp
+);
+CREATE INDEX items_user_id_created_at_key ON items (user_id, created_at);
+CREATE INDEX items_status_created_at_key ON items (status, created_at);
+CREATE INDEX items_created_at_key ON items (created_at);
