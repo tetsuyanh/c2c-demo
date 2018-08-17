@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -14,7 +13,6 @@ func handlerPostItem(c *gin.Context) {
 	i := model.DefaultItem()
 	if err := c.BindJSON(i); err != nil {
 		b, _ := ioutil.ReadAll(c.Request.Body)
-		fmt.Println("req: ", string(b))
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}

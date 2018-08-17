@@ -2,25 +2,30 @@ package v1
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/tetsuyanh/c2c-demo/repository"
 	"github.com/tetsuyanh/c2c-demo/service"
 )
 
 const (
 	headerSessionToken = "X-C2c-Session-Token"
 	requestUserID      = "requestUserID"
+	requesSelectOption = "requestSelectOption"
 )
 
 var (
 	userSrv service.UserService
 	itemSrv service.ItemService
+	dealSrv service.DealService
 )
 
 func Setup() error {
 	userSrv = service.GetUserService()
 	itemSrv = service.GetItemService()
+	dealSrv = service.GetDealService()
 	return nil
 }
 
@@ -40,6 +45,9 @@ func Router(e *gin.Engine) {
 		v1.POST("/items", handlerPostItem)
 		v1.PUT("/items/:id", handlerPutItem)
 		v1.DELETE("/items/:id", handlerDeleteItem)
+		v1.GET("/deals/seller", setSelectOption, handlerGetDealAsSeller)
+		v1.GET("/deals/buyer", setSelectOption, handlerGetDealAsBuyer)
+		v1.POST("/deals", handlerPostDeal)
 	}
 }
 
@@ -50,4 +58,33 @@ func setAuthenticatedUserID(c *gin.Context) {
 		return
 	}
 	c.Set(requestUserID, u.ID)
+}
+
+func setSelectOption(c *gin.Context) {
+	opt := repository.DefaultOption()
+
+	// keys
+	opt.SetUserId(c.GetString(requestUserID))
+
+	// conditions
+	limit := c.Query("limit")
+	if limit != "" {
+		l, err := strconv.Atoi(limit)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		opt.SetLimit(l)
+	}
+	offset := c.Query("offset")
+	if offset != "" {
+		o, err := strconv.Atoi(offset)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		opt.SetOffset(o)
+	}
+
+	c.Set(requesSelectOption, opt)
 }

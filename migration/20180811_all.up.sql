@@ -49,3 +49,14 @@ CREATE TABLE items (
 CREATE INDEX items_user_id_created_at_key ON items (user_id, created_at);
 CREATE INDEX items_status_created_at_key ON items (status, created_at);
 CREATE INDEX items_created_at_key ON items (created_at);
+
+CREATE TABLE deals (
+  id CHAR(10) PRIMARY KEY,
+  item_id CHAR(10) REFERENCES items(id) NOT NULL,
+  seller_id CHAR(10) REFERENCES users(id) NOT NULL,
+  buyer_id CHAR(10) REFERENCES users(id) NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT current_timestamp
+);
+CREATE INDEX deals_seller_id_created_at_key ON deals (seller_id, created_at);
+CREATE INDEX deals_buyer_id_created_at_key ON deals (buyer_id, created_at);
+CREATE INDEX deals_created_at_key ON deals (created_at);

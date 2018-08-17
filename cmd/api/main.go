@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -88,12 +87,10 @@ func loadConfig() (*conf.Config, error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName(name)
 	if errRead := viper.ReadInConfig(); errRead != nil {
-		fmt.Println("errRead:", errRead)
 		return nil, errRead
 	}
 	c := &conf.Config{}
 	if errUnmarshal := viper.Unmarshal(c); errUnmarshal != nil {
-		fmt.Println("errUnmarshal:", errUnmarshal)
 		return nil, errUnmarshal
 	}
 	return c, nil

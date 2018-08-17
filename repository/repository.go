@@ -49,6 +49,7 @@ func Setup(c conf.Postgres) error {
 	models[SessionTableName] = model.Session{}
 	models[AuthenticationTableName] = model.Authentication{}
 	models[ItemTableName] = model.Item{}
+	models[DealTableName] = model.Deal{}
 	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 	for k, v := range models {
 		dbMap.AddTableWithName(v, k).SetKeys(false, "id")
