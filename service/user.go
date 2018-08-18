@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
 	"github.com/tetsuyanh/c2c-demo/model"
 	"github.com/tetsuyanh/c2c-demo/repository"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -17,11 +18,10 @@ var (
 
 type (
 	UserService interface {
-		CreateUserSession() (*model.Session, error)
-		CreateSession(userID string) (*model.Session, error)
-		CreateAuth(userID, email, password string) (*model.Authentication, error)
 		GetUser(token string) (*model.User, error)
-		GetAuth(email, password string) (*model.Authentication, error)
+		Start() (*model.Session, error)
+		Login(email, password string) (*model.Session, error)
+		PublishAuth(userID, email, password string) (*model.Authentication, error)
 		EnableAuth(token string) error
 	}
 
@@ -41,7 +41,11 @@ func GetUserService() UserService {
 	return userService
 }
 
-func (us *userServiceImpl) CreateUserSession() (*model.Session, error) {
+func (us *userServiceImpl) GetUser(token string) (*model.User, error) {
+	return us.userRepo.FindUserBySettionToken(token)
+}
+
+func (us *userServiceImpl) Start() (*model.Session, error) {
 	u := model.DefaultUser()
 	s := model.DefaultSession()
 	s.UserId = &u.Id
@@ -53,41 +57,44 @@ func (us *userServiceImpl) CreateUserSession() (*model.Session, error) {
 	return s, nil
 }
 
-func (us *userServiceImpl) CreateSession(userId string) (*model.Session, error) {
+func (us *userServiceImpl) Login(email, password string) (*model.Session, error) {
+	a, err := us.userRepo.FindAuthByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	if !*a.Enabled {
+		return nil, fmt.Errorf("not enabled")
+	}
+	if !correctPassword(*a.Password, password) {
+		return nil, fmt.Errorf("invalid password")
+	}
+
 	s := model.DefaultSession()
-	s.UserId = &userId
+	s.UserId = a.UserId
 	if err := us.repo.Insert(s); err != nil {
 		return nil, err
 	}
 	return s, nil
 }
 
-func (us *userServiceImpl) CreateAuth(userID, email, password string) (*model.Authentication, error) {
+func (us *userServiceImpl) PublishAuth(userID, email, password string) (*model.Authentication, error) {
+	tx := us.repo.Transaction()
+
+	exist, _ := us.userRepo.FindAuthByEmail(email)
+	if exist != nil {
+		if *exist.Enabled {
+			return nil, fmt.Errorf("email already enabled")
+		}
+		tx.Delete(exist)
+	}
+
 	encrypted := encrypt(password)
 	a := model.DefaultAuthentication()
 	a.UserId = &userID
 	a.EMail = &email
 	a.Password = &encrypted
-	if err := us.repo.Insert(a); err != nil {
+	if err := tx.Insert(a).Commit(); err != nil {
 		return nil, err
-	}
-	return a, nil
-}
-
-func (us *userServiceImpl) GetUser(token string) (*model.User, error) {
-	return us.userRepo.FindUserBySettionToken(token)
-}
-
-func (us *userServiceImpl) GetAuth(email, password string) (*model.Authentication, error) {
-	a, errFind := us.userRepo.FindAuthByEmail(email)
-	if errFind != nil {
-		return nil, errFind
-	}
-	if !correctPassword(*a.Password, password) {
-		return nil, fmt.Errorf("invalid password")
-	}
-	if !*a.Enabled {
-		return nil, fmt.Errorf("not enabled")
 	}
 	return a, nil
 }

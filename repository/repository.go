@@ -87,7 +87,7 @@ func (r *repoImpl) Insert(i interface{}) error {
 
 func (r *repoImpl) Update(i interface{}) error {
 	if cnt, err := r.dbMap.Update(i); err != nil {
-		return fmt.Errorf("Update invalid query: %s", err)
+		return fmt.Errorf("invalid query to update: %s", err)
 	} else if cnt == 0 {
 		return fmt.Errorf("no target to update")
 	}
@@ -96,7 +96,7 @@ func (r *repoImpl) Update(i interface{}) error {
 
 func (r *repoImpl) Delete(i interface{}) error {
 	if cnt, err := r.dbMap.Delete(i); err != nil {
-		return fmt.Errorf("delete invalid query: %s", err)
+		return fmt.Errorf("invalid query to delete: %s", err)
 	} else if cnt == 0 {
 		return fmt.Errorf("no target to delete")
 	}

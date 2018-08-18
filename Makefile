@@ -16,11 +16,11 @@ update:
 test:
 	go test ./...
 
-run/%: cmd/%/main.go
-	go run $<
+run:
+	go run cmd/api/main.go
 
-build/%: cmd/%/main.go
-	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)-$*_$(VERSION) $<
+build:
+	go build -ldflags "$(LDFLAGS)" -o bin/$(NAME)-$*_$(VERSION) cmd/api/main.go
 
 info:
 	@echo version: ${VERSION}

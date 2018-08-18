@@ -13,7 +13,7 @@ type (
 	DealService interface {
 		GetDealAsSeller(opt *repository.Option) ([]*model.Deal, error)
 		GetDealAsBuyer(opt *repository.Option) ([]*model.Deal, error)
-		CreateDeal(itemId, buyerId string) (*model.Deal, error)
+		Establish(itemId, buyerId string) (*model.Deal, error)
 	}
 
 	dealServiceImpl struct {
@@ -33,14 +33,14 @@ func GetDealService() DealService {
 }
 
 func (ds *dealServiceImpl) GetDealAsSeller(opt *repository.Option) ([]*model.Deal, error) {
-	return ds.dealRepo.GetDealsAsSeller(opt)
+	return ds.dealRepo.SelectDealAsSeller(opt)
 }
 
 func (ds *dealServiceImpl) GetDealAsBuyer(opt *repository.Option) ([]*model.Deal, error) {
-	return ds.dealRepo.GetDealsAsBuyer(opt)
+	return ds.dealRepo.SelectDealAsBuyer(opt)
 }
 
-func (ds *dealServiceImpl) CreateDeal(itemId, buyerId string) (*model.Deal, error) {
+func (ds *dealServiceImpl) Establish(itemId, buyerId string) (*model.Deal, error) {
 	i, err := ds.repo.Get(model.Item{}, itemId)
 	if err != nil {
 		return nil, err

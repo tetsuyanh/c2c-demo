@@ -10,6 +10,7 @@ type (
 	Transaction interface {
 		Insert(i interface{}) Transaction
 		Update(i interface{}) Transaction
+		Delete(i interface{}) Transaction
 		Commit() error
 	}
 
@@ -32,6 +33,17 @@ func (t *transactionImpl) Update(i interface{}) Transaction {
 			t.err = err
 		} else if cnt <= 0 {
 			t.err = fmt.Errorf("no target to update")
+		}
+	}
+	return t
+}
+
+func (t *transactionImpl) Delete(i interface{}) Transaction {
+	if t.err == nil {
+		if cnt, err := t.tx.Delete(i); err != nil {
+			t.err = err
+		} else if cnt <= 0 {
+			t.err = fmt.Errorf("no target to delete")
 		}
 	}
 	return t

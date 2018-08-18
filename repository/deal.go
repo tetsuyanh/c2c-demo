@@ -16,8 +16,8 @@ var (
 
 type (
 	DealRepo interface {
-		GetDealsAsSeller(opt *Option) ([]*model.Deal, error)
-		GetDealsAsBuyer(opt *Option) ([]*model.Deal, error)
+		SelectDealAsSeller(opt *Option) ([]*model.Deal, error)
+		SelectDealAsBuyer(opt *Option) ([]*model.Deal, error)
 	}
 
 	dealRepoImpl struct{}
@@ -30,7 +30,7 @@ func GetDealRepo() DealRepo {
 	return dealRepo
 }
 
-func (dr *dealRepoImpl) GetDealsAsSeller(opt *Option) ([]*model.Deal, error) {
+func (dr *dealRepoImpl) SelectDealAsSeller(opt *Option) ([]*model.Deal, error) {
 	q := fmt.Sprintf(`
 		select
 		 	*
@@ -53,7 +53,7 @@ func (dr *dealRepoImpl) GetDealsAsSeller(opt *Option) ([]*model.Deal, error) {
 	return ds, nil
 }
 
-func (dr *dealRepoImpl) GetDealsAsBuyer(opt *Option) ([]*model.Deal, error) {
+func (dr *dealRepoImpl) SelectDealAsBuyer(opt *Option) ([]*model.Deal, error) {
 	q := fmt.Sprintf(`
 		select
 		 	*
