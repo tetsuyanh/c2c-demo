@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/tetsuyanh/c2c-demo/model"
 	"github.com/tetsuyanh/c2c-demo/repository"
@@ -10,6 +11,8 @@ import (
 
 var (
 	userService UserService
+
+	initialPoint = 10000
 )
 
 type (
@@ -90,7 +93,24 @@ func (us *userServiceImpl) GetAuth(email, password string) (*model.Authenticatio
 }
 
 func (us *userServiceImpl) EnableAuth(token string) error {
-	return us.userRepo.UpdateAuthEnable(token)
+	au, err := us.userRepo.FindAuthByToken(token)
+	if err != nil {
+		return err
+	}
+	if *au.Enabled {
+		return fmt.Errorf("already enabled")
+	}
+	tr := true
+	t := time.Now()
+	au.Enabled = &tr
+	au.UpdatedAt = &t
+
+	as := model.DefaultAsset()
+	as.UserId = au.UserId
+	as.Point = &initialPoint
+
+	tx := us.repo.Transaction()
+	return tx.Update(au).Insert(as).Commit()
 }
 
 func encrypt(password string) string {

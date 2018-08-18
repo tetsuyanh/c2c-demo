@@ -18,7 +18,7 @@ type (
 	UserRepo interface {
 		FindUserBySettionToken(token string) (*model.User, error)
 		FindAuthByEmail(email string) (*model.Authentication, error)
-		UpdateAuthEnable(token string) error
+		FindAuthByToken(token string) (*model.Authentication, error)
 	}
 
 	userRepoImpl struct{}
@@ -63,15 +63,17 @@ func (ur *userRepoImpl) FindAuthByEmail(email string) (*model.Authentication, er
 	return u, nil
 }
 
-func (ur *userRepoImpl) UpdateAuthEnable(token string) error {
-	return resultExec(repo.dbMap.Exec(`
-		update
+func (ur *userRepoImpl) FindAuthByToken(token string) (*model.Authentication, error) {
+	u := &model.Authentication{}
+	if err := repo.dbMap.SelectOne(u, `
+		select
+			*
+		from
 			authentications
-		set
-			enabled = true,
-			updated_at = now()
 		where
-			token = $1 and
-			enabled = false
-			`, token))
+			token = $1
+		`, token); err != nil {
+		return nil, err
+	}
+	return u, nil
 }
