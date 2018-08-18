@@ -35,7 +35,7 @@ func handlerPostAuthPublish(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	a, err := userSrv.CreateAuth(c.GetString(requestUserID), req.EMail, req.Password)
+	a, err := userSrv.CreateAuth(c.GetString(requestUserID), *req.EMail, *req.Password)
 	if err != nil {
 		log.Printf("userSrv.CreateAuth: %v\n", err)
 		c.AbortWithError(http.StatusInternalServerError, err)
@@ -52,7 +52,7 @@ func handlerPostAuthLogin(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	a, errFind := userSrv.GetAuth(req.EMail, req.Password)
+	a, errFind := userSrv.GetAuth(*req.EMail, *req.Password)
 	if errFind != nil {
 		log.Printf("userSrv.errFind: %v\n", errFind)
 		c.AbortWithError(http.StatusUnauthorized, errFind)
@@ -61,7 +61,7 @@ func handlerPostAuthLogin(c *gin.Context) {
 	// TODO: merge user data
 	// previsou user is a.UserID
 	// current user is c.GetString(AuthenticatedUserID)
-	s, errCreate := userSrv.CreateSession(a.UserID)
+	s, errCreate := userSrv.CreateSession(*a.UserId)
 	if errCreate != nil {
 		log.Printf("userSrv.errCreate: %v\n", errCreate)
 		c.AbortWithError(http.StatusInternalServerError, errCreate)

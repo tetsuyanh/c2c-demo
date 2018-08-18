@@ -57,7 +57,7 @@ func setAuthenticatedUserID(c *gin.Context) {
 		c.AbortWithError(http.StatusUnauthorized, err)
 		return
 	}
-	c.Set(requestUserID, u.ID)
+	c.Set(requestUserID, u.Id)
 }
 
 func setSelectOption(c *gin.Context) {

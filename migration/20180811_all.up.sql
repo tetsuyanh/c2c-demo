@@ -52,7 +52,7 @@ CREATE INDEX items_created_at_key ON items (created_at);
 
 CREATE TABLE deals (
   id CHAR(10) PRIMARY KEY,
-  item_id CHAR(10) REFERENCES items(id) NOT NULL,
+  item_id CHAR(10) REFERENCES items(id) UNIQUE NOT NULL,
   seller_id CHAR(10) REFERENCES users(id) NOT NULL,
   buyer_id CHAR(10) REFERENCES users(id) NOT NULL,
   created_at TIMESTAMPTZ DEFAULT current_timestamp

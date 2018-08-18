@@ -21,6 +21,7 @@ type (
 		Insert(i interface{}) error
 		Update(i interface{}) error
 		Delete(i interface{}) error
+		Transaction() Transaction
 	}
 
 	repoImpl struct {
@@ -46,6 +47,7 @@ func Setup(c conf.Postgres) error {
 
 	models := make(map[string]interface{}, 64)
 	models[UserTableName] = model.User{}
+	models[AssetTableName] = model.Asset{}
 	models[SessionTableName] = model.Session{}
 	models[AuthenticationTableName] = model.Authentication{}
 	models[ItemTableName] = model.Item{}
@@ -87,7 +89,7 @@ func (r *repoImpl) Update(i interface{}) error {
 	if cnt, err := r.dbMap.Update(i); err != nil {
 		return fmt.Errorf("Update invalid query: %s", err)
 	} else if cnt == 0 {
-		return fmt.Errorf("Update no target")
+		return fmt.Errorf("no target to update")
 	}
 	return nil
 }
@@ -96,9 +98,17 @@ func (r *repoImpl) Delete(i interface{}) error {
 	if cnt, err := r.dbMap.Delete(i); err != nil {
 		return fmt.Errorf("delete invalid query: %s", err)
 	} else if cnt == 0 {
-		return fmt.Errorf("delete no target")
+		return fmt.Errorf("no target to delete")
 	}
 	return nil
+}
+
+func (r *repoImpl) Transaction() Transaction {
+	tx, err := r.dbMap.Begin()
+	return &transactionImpl{
+		tx:  tx,
+		err: err,
+	}
 }
 
 func resultExec(result sql.Result, err error) error {

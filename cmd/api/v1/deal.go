@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,7 +31,6 @@ func handlerGetDealAsBuyer(c *gin.Context) {
 func handlerPostDeal(c *gin.Context) {
 	req := model.DefaultDeal()
 	if err := c.BindJSON(req); err != nil {
-		b, _ := ioutil.ReadAll(c.Request.Body)
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
