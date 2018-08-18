@@ -9,19 +9,17 @@ import (
 )
 
 func handlerPostItem(c *gin.Context) {
-	i := model.DefaultItem()
-	if err := c.BindJSON(i); err != nil {
+	req := &model.Item{}
+	if err := c.BindJSON(req); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 	uId := c.GetString(requestUserID)
-	t := time.Now()
-	i.UserID = &uId
-	i.CreatedAt = &t
-	i.UpdatedAt = &t
-	// TODO: validation
-	userID := c.GetString(requestUserID)
-	i.UserID = &userID
+	i := model.DefaultItem()
+	i.UserId = &uId
+	i.Label = req.Label
+	i.Description = req.Description
+	i.Price = req.Price
 	if err := itemSrv.CreateItem(i); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

@@ -11,8 +11,8 @@ var (
 )
 
 type Item struct {
-	ID          string     `db:"id" json:"id"`
-	UserID      *string    `db:"user_id" json:"userId,omitempty"`
+	Id          string     `db:"id" json:"id"`
+	UserId      *string    `db:"user_id" json:"userId,omitempty"`
 	Label       *string    `db:"label" json:"label,omitempty"`
 	Description *string    `db:"description" json:"description,omitempty"`
 	Price       *int       `db:"price" json:"price,omitempty"`
@@ -22,6 +22,7 @@ type Item struct {
 }
 
 func DefaultItem() *Item {
+	t := time.Now()
 	return &Item{
 		generateID(),
 		nil,
@@ -29,7 +30,7 @@ func DefaultItem() *Item {
 		nil,
 		nil,
 		&ItemStatusNotSold,
-		nil,
-		nil,
+		&t,
+		&t,
 	}
 }

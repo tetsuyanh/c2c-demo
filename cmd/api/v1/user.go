@@ -20,8 +20,8 @@ func handlerPostSession(c *gin.Context) {
 
 func handlerGetAuthEnable(c *gin.Context) {
 	token, _ := c.GetQuery("token")
-	if eEnable := userSrv.EnableAuth(token); eEnable != nil {
-		log.Printf("userSrv.EnableAuth: %v\n", eEnable)
+	if err := userSrv.EnableAuth(token); err != nil {
+		log.Printf("userSrv.EnableAuth: %v\n", err)
 		c.Status(http.StatusBadRequest)
 		return
 	}

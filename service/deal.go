@@ -11,8 +11,8 @@ var (
 
 type (
 	DealService interface {
-		GetDealSelfSeller(opt *repository.Option) ([]*model.Deal, error)
-		GetDealSelfBuyer(opt *repository.Option) ([]*model.Deal, error)
+		GetDealAsSeller(opt *repository.Option) ([]*model.Deal, error)
+		GetDealAsBuyer(opt *repository.Option) ([]*model.Deal, error)
 		CreateDeal(itemId, buyerId string) (*model.Deal, error)
 	}
 
@@ -32,11 +32,11 @@ func GetDealService() DealService {
 	return dealService
 }
 
-func (ds *dealServiceImpl) GetDealSelfSeller(opt *repository.Option) ([]*model.Deal, error) {
+func (ds *dealServiceImpl) GetDealAsSeller(opt *repository.Option) ([]*model.Deal, error) {
 	return ds.dealRepo.GetDealsAsSeller(opt)
 }
 
-func (ds *dealServiceImpl) GetDealSelfBuyer(opt *repository.Option) ([]*model.Deal, error) {
+func (ds *dealServiceImpl) GetDealAsBuyer(opt *repository.Option) ([]*model.Deal, error) {
 	return ds.dealRepo.GetDealsAsBuyer(opt)
 }
 
@@ -47,7 +47,7 @@ func (ds *dealServiceImpl) CreateDeal(itemId, buyerId string) (*model.Deal, erro
 	}
 	d := model.DefaultDeal()
 	d.ItemId = &itemId
-	d.SellerId = i.(*model.Item).UserID
+	d.SellerId = i.(*model.Item).UserId
 	d.BuyerId = &buyerId
 	if err := ds.repo.Insert(d); err != nil {
 		return nil, err

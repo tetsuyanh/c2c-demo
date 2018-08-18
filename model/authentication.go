@@ -9,25 +9,27 @@ const (
 )
 
 type Authentication struct {
-	ID        string     `db:"id" json:"id"`
-	UserID    string     `db:"user_id" json:"userId,omitempty"`
-	EMail     string     `db:"email" json:"email,omitempty"`
-	Password  string     `db:"password" json:"password,omitempty"`
-	Token     string     `db:"token" json:"token,omitempty"`
-	Enabled   bool       `db:"enabled" json:"enabled,omitempty"`
+	Id        string     `db:"id" json:"id"`
+	UserId    *string    `db:"user_id" json:"userId,omitempty"`
+	EMail     *string    `db:"email" json:"email,omitempty"`
+	Password  *string    `db:"password" json:"password,omitempty"`
+	Token     *string    `db:"token" json:"token,omitempty"`
+	Enabled   *bool      `db:"enabled" json:"enabled,omitempty"`
 	CreatedAt *time.Time `db:"created_at" json:"createdAt,omitempty"`
 	UpdatedAt *time.Time `db:"updated_at" json:"updatedAt,omitempty"`
 }
 
-func NewAuthentication(userID, email, password string) *Authentication {
+func DefaultAuthentication() *Authentication {
 	t := time.Now()
+	token := generateRandomString(AuthTokenSize)
+	enable := false
 	return &Authentication{
 		generateID(),
-		userID,
-		email,
-		password,
-		generateRandomString(AuthTokenSize),
-		false,
+		nil,
+		nil,
+		nil,
+		&token,
+		&enable,
 		&t,
 		&t,
 	}

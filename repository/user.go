@@ -16,9 +16,6 @@ var (
 
 type (
 	UserRepo interface {
-		CreateUser(u *model.User) error
-		CreateSession(s *model.Session) error
-		CreateAuth(a *model.Authentication) error
 		FindUserBySettionToken(token string) (*model.User, error)
 		FindAuthByEmail(email string) (*model.Authentication, error)
 		UpdateAuthEnable(token string) error
@@ -32,27 +29,6 @@ func GetUserRepo() UserRepo {
 		userRepo = &userRepoImpl{}
 	}
 	return userRepo
-}
-
-func (r *userRepoImpl) CreateUser(u *model.User) error {
-	if err := repo.dbMap.Insert(u); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *userRepoImpl) CreateSession(s *model.Session) error {
-	if err := repo.dbMap.Insert(s); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (r *userRepoImpl) CreateAuth(a *model.Authentication) error {
-	if err := repo.dbMap.Insert(a); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (ur *userRepoImpl) FindUserBySettionToken(token string) (*model.User, error) {

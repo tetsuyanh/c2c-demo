@@ -23,6 +23,7 @@ type (
 	}
 
 	userServiceImpl struct {
+		repo     repository.Repo
 		userRepo repository.UserRepo
 	}
 )
@@ -30,6 +31,7 @@ type (
 func GetUserService() UserService {
 	if userService == nil {
 		userService = &userServiceImpl{
+			repo:     repository.GetRepository(),
 			userRepo: repository.GetUserRepo(),
 		}
 	}
@@ -37,28 +39,36 @@ func GetUserService() UserService {
 }
 
 func (us *userServiceImpl) CreateUserSession() (*model.Session, error) {
-	u := model.NewUser()
-	if err := us.userRepo.CreateUser(u); err != nil {
-		return nil, err
-	}
-	s, err := us.CreateSession(u.ID)
-	if err != nil {
+	u := model.DefaultUser()
+	s := model.DefaultSession()
+	s.UserId = &u.Id
+
+	tx := us.repo.Transaction()
+	if err := tx.Insert(u).Insert(s).Commit(); err != nil {
 		return nil, err
 	}
 	return s, nil
 }
 
-func (us *userServiceImpl) CreateSession(userID string) (*model.Session, error) {
-	s := model.NewSession(userID)
-	if err := us.userRepo.CreateSession(s); err != nil {
+func (us *userServiceImpl) CreateSession(userId string) (*model.Session, error) {
+	s := model.DefaultSession()
+	s.UserId = &userId
+	if err := us.repo.Insert(s); err != nil {
 		return nil, err
 	}
 	return s, nil
 }
 
 func (us *userServiceImpl) CreateAuth(userID, email, password string) (*model.Authentication, error) {
-	a := model.NewAuthentication(userID, email, encrypt(password))
-	return a, us.userRepo.CreateAuth(a)
+	encrypted := encrypt(password)
+	a := model.DefaultAuthentication()
+	a.UserId = &userID
+	a.EMail = &email
+	a.Password = &encrypted
+	if err := us.repo.Insert(a); err != nil {
+		return nil, err
+	}
+	return a, nil
 }
 
 func (us *userServiceImpl) GetUser(token string) (*model.User, error) {
@@ -70,10 +80,10 @@ func (us *userServiceImpl) GetAuth(email, password string) (*model.Authenticatio
 	if errFind != nil {
 		return nil, errFind
 	}
-	if !correctPassword(a.Password, password) {
+	if !correctPassword(*a.Password, password) {
 		return nil, fmt.Errorf("invalid password")
 	}
-	if !a.Enabled {
+	if !*a.Enabled {
 		return nil, fmt.Errorf("not enabled")
 	}
 	return a, nil

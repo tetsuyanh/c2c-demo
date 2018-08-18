@@ -10,7 +10,7 @@ import (
 
 func handlerGetDealAsSeller(c *gin.Context) {
 	opt, _ := c.Get(requesSelectOption)
-	d, err := dealSrv.GetDealSelfSeller(opt.(*repository.Option))
+	d, err := dealSrv.GetDealAsSeller(opt.(*repository.Option))
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
@@ -20,7 +20,7 @@ func handlerGetDealAsSeller(c *gin.Context) {
 
 func handlerGetDealAsBuyer(c *gin.Context) {
 	opt, _ := c.Get(requesSelectOption)
-	d, err := dealSrv.GetDealSelfBuyer(opt.(*repository.Option))
+	d, err := dealSrv.GetDealAsBuyer(opt.(*repository.Option))
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
@@ -29,8 +29,8 @@ func handlerGetDealAsBuyer(c *gin.Context) {
 }
 
 func handlerPostDeal(c *gin.Context) {
-	req := model.DefaultDeal()
-	if err := c.BindJSON(req); err != nil {
+	req := model.Deal{}
+	if err := c.BindJSON(&req); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
