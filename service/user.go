@@ -19,6 +19,7 @@ var (
 type (
 	UserService interface {
 		GetUser(token string) (*model.User, error)
+		GetAsset(userId string) (*model.Asset, error)
 		Start() (*model.Session, error)
 		Login(email, password string) (*model.Session, error)
 		PublishAuth(userID, email, password string) (*model.Authentication, error)
@@ -43,6 +44,10 @@ func GetUserService() UserService {
 
 func (us *userServiceImpl) GetUser(token string) (*model.User, error) {
 	return us.userRepo.FindUserBySettionToken(token)
+}
+
+func (us *userServiceImpl) GetAsset(userId string) (*model.Asset, error) {
+	return us.userRepo.FindAssetByUserId(userId)
 }
 
 func (us *userServiceImpl) Start() (*model.Session, error) {

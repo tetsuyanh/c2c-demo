@@ -18,6 +18,7 @@ type (
 
 	dealServiceImpl struct {
 		repo     repository.Repo
+		userRepo repository.UserRepo
 		dealRepo repository.DealRepo
 	}
 )
@@ -26,6 +27,7 @@ func GetDealService() DealService {
 	if dealService == nil {
 		dealService = &dealServiceImpl{
 			repo:     repository.GetRepository(),
+			userRepo: repository.GetUserRepo(),
 			dealRepo: repository.GetDealRepo(),
 		}
 	}
@@ -41,15 +43,35 @@ func (ds *dealServiceImpl) GetDealAsBuyer(opt *repository.Option) ([]*model.Deal
 }
 
 func (ds *dealServiceImpl) Establish(itemId, buyerId string) (*model.Deal, error) {
-	i, err := ds.repo.Get(model.Item{}, itemId)
+	obj, err := ds.repo.Get(model.Item{}, itemId)
 	if err != nil {
 		return nil, err
 	}
+	tx := ds.repo.Transaction()
+
+	i := obj.(*model.Item)
+	i.Status = &model.ItemStatusSoldOut
+
 	d := model.DefaultDeal()
 	d.ItemId = &itemId
-	d.SellerId = i.(*model.Item).UserId
+	d.SellerId = i.UserId
 	d.BuyerId = &buyerId
-	if err := ds.repo.Insert(d); err != nil {
+
+	sellerAs, err := ds.userRepo.FindAssetByUserId(*d.SellerId)
+	if err != nil {
+		return nil, err
+	}
+	sellerPnt := *sellerAs.Point + *i.Price
+	sellerAs.Point = &sellerPnt
+
+	buyerAs, err := ds.userRepo.FindAssetByUserId(*d.BuyerId)
+	if err != nil {
+		return nil, err
+	}
+	buyerPnt := *buyerAs.Point - *i.Price
+	buyerAs.Point = &buyerPnt
+
+	if err := tx.Update(i).Insert(d).Update(sellerAs).Update(buyerAs).Commit(); err != nil {
 		return nil, err
 	}
 	return d, nil

@@ -19,6 +19,7 @@ type (
 		FindUserBySettionToken(token string) (*model.User, error)
 		FindAuthByEmail(email string) (*model.Authentication, error)
 		FindAuthByToken(token string) (*model.Authentication, error)
+		FindAssetByUserId(userId string) (*model.Asset, error)
 	}
 
 	userRepoImpl struct{}
@@ -73,6 +74,21 @@ func (ur *userRepoImpl) FindAuthByToken(token string) (*model.Authentication, er
 		where
 			token = $1
 		`, token); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (ur *userRepoImpl) FindAssetByUserId(userId string) (*model.Asset, error) {
+	u := &model.Asset{}
+	if err := repo.dbMap.SelectOne(u, `
+		select
+			*
+		from
+			assets
+		where
+			user_id = $1
+		`, userId); err != nil {
 		return nil, err
 	}
 	return u, nil

@@ -28,7 +28,7 @@ CREATE INDEX authentications_created_at_key ON authentications (created_at);
 CREATE TABLE assets (
   id CHAR(10) PRIMARY KEY,
   user_id CHAR(10) REFERENCES users(id) UNIQUE NOT NULL,
-  point CHAR(32) DEFAULT 0,
+  point INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT current_timestamp,
   updated_at TIMESTAMPTZ DEFAULT current_timestamp
 );
