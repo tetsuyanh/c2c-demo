@@ -21,6 +21,7 @@ type (
 		Insert(i interface{}) error
 		Update(i interface{}) error
 		Delete(i interface{}) error
+		Exec(q string) error
 		Transaction() Transaction
 	}
 
@@ -54,7 +55,13 @@ func Setup(c conf.Postgres) error {
 	models[DealTableName] = model.Deal{}
 	dbMap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 	for k, v := range models {
-		dbMap.AddTableWithName(v, k).SetKeys(false, "id")
+		t := dbMap.AddTableWithName(v, k)
+		t.SetKeys(false, "id")
+		// table using auto locking by gorp have to call this function
+		// see https://github.com/go-gorp/gorp#optimistic-locking
+		if k == AssetTableName || k == ItemTableName {
+			t.SetVersionCol("version")
+		}
 	}
 
 	repo = &repoImpl{
@@ -99,6 +106,15 @@ func (r *repoImpl) Delete(i interface{}) error {
 		return fmt.Errorf("invalid query to delete: %s", err)
 	} else if cnt == 0 {
 		return fmt.Errorf("no target to delete")
+	}
+	return nil
+}
+
+// Exec is to exec
+func (r *repoImpl) Exec(q string) error {
+	_, err := r.dbMap.Exec(q)
+	if err != nil {
+		return err
 	}
 	return nil
 }

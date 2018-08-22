@@ -19,6 +19,10 @@ type Item struct {
 	Status      *string    `db:"status" json:"status,omitempty"`
 	CreatedAt   *time.Time `db:"created_at" json:"createdAt,omitempty"`
 	UpdatedAt   *time.Time `db:"updated_at" json:"updatedAt,omitempty"`
+
+	// auto locking by gorp
+	// see https://github.com/go-gorp/gorp#optimistic-locking
+	Version int64 `db:"version" json:"-"`
 }
 
 func DefaultItem() *Item {
@@ -32,5 +36,6 @@ func DefaultItem() *Item {
 		&ItemStatusNotSold,
 		&t,
 		&t,
+		0,
 	}
 }

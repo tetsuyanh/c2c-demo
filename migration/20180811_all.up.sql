@@ -30,7 +30,8 @@ CREATE TABLE assets (
   user_id CHAR(10) REFERENCES users(id) UNIQUE NOT NULL,
   point INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT current_timestamp,
-  updated_at TIMESTAMPTZ DEFAULT current_timestamp
+  updated_at TIMESTAMPTZ DEFAULT current_timestamp,
+  version BIGINT
 );
 CREATE INDEX assets_created_at_key ON assets (created_at);
 
@@ -44,7 +45,8 @@ CREATE TABLE items (
   price INT NOT NULL,
   status item_status NOT NULL,
   created_at TIMESTAMPTZ DEFAULT current_timestamp,
-  updated_at TIMESTAMPTZ DEFAULT current_timestamp
+  updated_at TIMESTAMPTZ DEFAULT current_timestamp,
+  version BIGINT
 );
 CREATE INDEX items_user_id_created_at_key ON items (user_id, created_at);
 CREATE INDEX items_status_created_at_key ON items (status, created_at);
