@@ -85,7 +85,14 @@ func GetRepository() Repo {
 }
 
 func (r *repoImpl) Get(i interface{}, id string) (interface{}, error) {
-	return r.dbMap.Get(i, id)
+	obj, err := r.dbMap.Get(i, id)
+	if err != nil {
+		return nil, err
+	} else if obj == nil && err == nil {
+		// when row is not found, gorp returns nil, nil
+		return nil, fmt.Errorf("not found")
+	}
+	return obj, err
 }
 
 func (r *repoImpl) Insert(i interface{}) error {
