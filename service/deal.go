@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/tetsuyanh/c2c-demo/model"
 	"github.com/tetsuyanh/c2c-demo/repository"
@@ -20,7 +19,6 @@ type (
 	}
 
 	dealServiceImpl struct {
-		mu       *sync.Mutex
 		repo     repository.Repo
 		userRepo repository.UserRepo
 		dealRepo repository.DealRepo
@@ -30,7 +28,6 @@ type (
 func GetDealService() DealService {
 	if dealService == nil {
 		dealService = &dealServiceImpl{
-			mu:       &sync.Mutex{},
 			repo:     repository.GetRepository(),
 			userRepo: repository.GetUserRepo(),
 			dealRepo: repository.GetDealRepo(),
@@ -48,9 +45,6 @@ func (ds *dealServiceImpl) GetDealAsBuyer(opt *repository.Option) ([]*model.Deal
 }
 
 func (ds *dealServiceImpl) Establish(itemId, buyerId string) (*model.Deal, error) {
-	ds.mu.Lock()
-	defer ds.mu.Unlock()
-
 	obj, err := ds.repo.Get(model.Item{}, itemId)
 	if err != nil {
 		return nil, err

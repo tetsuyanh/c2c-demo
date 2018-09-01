@@ -1,6 +1,7 @@
 package service
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,14 +24,12 @@ func TestEstablish(t *testing.T) {
 	dealSrv := GetDealService()
 
 	// perfect data of 1 seller has multiple items and multiple buyers
-	parallel := 10
+	parallel := 3
 	seller, _, _, _ := createPerfectUser()
 	items := make([]*model.Item, parallel)
-	var pointSum int
 	for idx, _ := range items {
 		i := createItem(seller, model.ItemStatusSold)
 		items[idx] = i
-		pointSum += *i.Price
 	}
 	buyers := make([]*model.User, parallel)
 	for idx, _ := range buyers {
@@ -61,20 +60,33 @@ func TestEstablish(t *testing.T) {
 	}
 
 	// when seller's items are purchased at the same time
-	// expect all deals become succeeded
 	{
-		ch := make(chan error, parallel)
-		for idx, _ := range buyers {
-			go func(i int) {
-				_, err := dealSrv.Establish(items[i].Id, buyers[i].Id)
-				ch <- err
-			}(idx)
+		wg := new(sync.WaitGroup)
+		ch := make(chan struct{}, parallel)
+		for i := 0; i < parallel; i++ {
+			wg.Add(1)
+			idx := i
+			go func(itemId, buyerId string) {
+				defer wg.Done()
+				if _, e := dealSrv.Establish(itemId, buyerId); e == nil {
+					ch <- struct{}{}
+				}
+			}(items[idx].Id, buyers[idx].Id)
 		}
-		for range buyers {
-			ast.Nil(<-ch)
+		go func() {
+			wg.Wait()
+			close(ch)
+		}()
+		cntSuccess := 0
+		for range ch {
+			cntSuccess++
 		}
+		// at least one deal become success
+		ast.NotEqual(0, cntSuccess)
+		ast.NotEqual(parallel, cntSuccess)
+		// correct point
 		as, _ := userSrv.GetAsset(seller.Id)
-		ast.Equal(initialPoint+pointSum, *as.Point)
+		ast.Equal(initialPoint+(testItemPrice*cntSuccess), *as.Point)
 	}
 
 	clearAll(repository.GetRepository())
