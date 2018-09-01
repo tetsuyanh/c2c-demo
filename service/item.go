@@ -96,8 +96,8 @@ func (is *itemServiceImpl) DeleteItem(id string) error {
 		return err
 	}
 	i := obj.(*model.Item)
-	// can delete only status is notsold
-	if *i.Status != model.ItemStatusNotSold {
+	// can update except soldout
+	if *i.Status == model.ItemStatusSoldOut {
 		return fmt.Errorf("not stauts to delete")
 	}
 
