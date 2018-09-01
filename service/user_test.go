@@ -21,7 +21,7 @@ func TestGetUser(t *testing.T) {
 	{
 		an := createAnonymousUser()
 		s := createSession(an.Id)
-		u, e := userSrv.GetUser(*s.Token)
+		u, e := userSrv.GetUser(s.Token)
 		ast.NotNil(u)
 		ast.Nil(e)
 	}
@@ -74,7 +74,7 @@ func TestLogin(t *testing.T) {
 	{
 		an := createAnonymousUser()
 		au := createAuthentication(an, false)
-		s, e := userSrv.Login(*au.EMail, testAuthPass)
+		s, e := userSrv.Login(au.EMail, testAuthPass)
 		ast.Nil(s)
 		ast.NotNil(e)
 	}
@@ -82,7 +82,7 @@ func TestLogin(t *testing.T) {
 	// invalid password
 	{
 		_, au, _, _ := createPerfectUser()
-		s, e := userSrv.Login(*au.EMail, "hogehoge")
+		s, e := userSrv.Login(au.EMail, "hogehoge")
 		ast.Nil(s)
 		ast.NotNil(e)
 	}
@@ -90,7 +90,7 @@ func TestLogin(t *testing.T) {
 	// success
 	{
 		_, au, _, _ := createPerfectUser()
-		s, e := userSrv.Login(*au.EMail, testAuthPass)
+		s, e := userSrv.Login(au.EMail, testAuthPass)
 		ast.NotNil(s)
 		ast.Nil(e)
 	}
@@ -103,7 +103,7 @@ func TestPublishAuth(t *testing.T) {
 	// already enabled
 	{
 		pu, au, _, _ := createPerfectUser()
-		a, e := userSrv.PublishAuth(pu.Id, *au.EMail, testAuthPass)
+		a, e := userSrv.PublishAuth(pu.Id, au.EMail, testAuthPass)
 		ast.Nil(a)
 		ast.NotNil(e)
 	}
@@ -112,7 +112,7 @@ func TestPublishAuth(t *testing.T) {
 	{
 		an := createAnonymousUser()
 		au := createAuthentication(an, false)
-		s, e := userSrv.PublishAuth(an.Id, *au.EMail, testAuthPass)
+		s, e := userSrv.PublishAuth(an.Id, au.EMail, testAuthPass)
 		ast.NotNil(s)
 		ast.Nil(e)
 	}
@@ -140,7 +140,7 @@ func TestEnableAuth(t *testing.T) {
 	// already enabled
 	{
 		_, au, _, _ := createPerfectUser()
-		e := userSrv.EnableAuth(*au.Token)
+		e := userSrv.EnableAuth(au.Token)
 		ast.NotNil(e)
 	}
 
@@ -148,7 +148,7 @@ func TestEnableAuth(t *testing.T) {
 	{
 		an := createAnonymousUser()
 		au := createAuthentication(an, false)
-		e := userSrv.EnableAuth(*au.Token)
+		e := userSrv.EnableAuth(au.Token)
 		ast.Nil(e)
 	}
 }

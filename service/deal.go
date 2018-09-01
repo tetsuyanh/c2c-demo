@@ -52,32 +52,30 @@ func (ds *dealServiceImpl) Establish(itemId, buyerId string) (*model.Deal, error
 	tx := ds.repo.Transaction()
 
 	i := obj.(*model.Item)
-	if *i.Status != model.ItemStatusSold {
+	if i.Status != model.ItemStatusSold {
 		return nil, fmt.Errorf("item invalid status")
 	}
-	i.Status = &model.ItemStatusSoldOut
+	i.Status = model.ItemStatusSoldOut
 	tx.Update(i)
 
 	d := model.DefaultDeal()
-	d.ItemId = &itemId
+	d.ItemId = itemId
 	d.SellerId = i.UserId
-	d.BuyerId = &buyerId
+	d.BuyerId = buyerId
 	tx.Insert(d)
 
-	sellerAs, err := ds.userRepo.FindAssetByUserId(*d.SellerId)
+	sellerAs, err := ds.userRepo.FindAssetByUserId(d.SellerId)
 	if err != nil {
 		return nil, err
 	}
-	sellerPnt := *sellerAs.Point + *i.Price
-	sellerAs.Point = &sellerPnt
+	sellerAs.Point = sellerAs.Point + i.Price
 	tx.Update(sellerAs)
 
-	buyerAs, err := ds.userRepo.FindAssetByUserId(*d.BuyerId)
+	buyerAs, err := ds.userRepo.FindAssetByUserId(d.BuyerId)
 	if err != nil {
 		return nil, err
 	}
-	buyerPnt := *buyerAs.Point - *i.Price
-	buyerAs.Point = &buyerPnt
+	buyerAs.Point = buyerAs.Point - i.Price
 	tx.Update(buyerAs)
 
 	if err := tx.Commit(); err != nil {

@@ -47,7 +47,7 @@ func (is *itemServiceImpl) GetItem(id string) (*model.Item, error) {
 
 func (is *itemServiceImpl) CreateItem(userId string, req *model.Item) (*model.Item, error) {
 	i := model.DefaultItem()
-	i.UserId = &userId
+	i.UserId = userId
 	i.Label = req.Label
 	i.Description = req.Description
 	i.Price = req.Price
@@ -63,26 +63,25 @@ func (is *itemServiceImpl) UpdateItem(id string, req *model.Item) (*model.Item, 
 		return nil, err
 	}
 	i := obj.(*model.Item)
-	// can update except soldout
-	if *i.Status == model.ItemStatusSoldOut {
+	// updating status 'soldout' is allowed for dealService
+	if i.Status == model.ItemStatusSoldOut {
 		return nil, fmt.Errorf("not stauts to update")
 	}
 
-	// restriction to update
-	if req.Label != nil {
+	// limited fields to update
+	if req.Label != "" {
 		i.Label = req.Label
 	}
-	if req.Description != nil {
+	if req.Description != "" {
 		i.Description = req.Description
 	}
-	if req.Price != nil {
+	if req.Price != 0 {
 		i.Price = req.Price
 	}
-	if req.Status != nil {
+	if req.Status != "" {
 		i.Status = req.Status
 	}
-	t := time.Now()
-	req.UpdatedAt = &t
+	req.UpdatedAt = time.Now()
 
 	if err := is.repo.Update(i); err != nil {
 		return nil, err
@@ -97,7 +96,7 @@ func (is *itemServiceImpl) DeleteItem(id string) error {
 	}
 	i := obj.(*model.Item)
 	// can update except soldout
-	if *i.Status == model.ItemStatusSoldOut {
+	if i.Status == model.ItemStatusSoldOut {
 		return fmt.Errorf("not stauts to delete")
 	}
 

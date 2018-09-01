@@ -35,7 +35,7 @@ func handlerPostDeal(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	d, err := dealSrv.Establish(*req.ItemId, c.GetString(requestUserID))
+	d, err := dealSrv.Establish(req.ItemId, c.GetString(requestUserID))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

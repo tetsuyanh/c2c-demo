@@ -86,7 +86,7 @@ func TestEstablish(t *testing.T) {
 		ast.NotEqual(parallel, cntSuccess)
 		// correct point
 		as, _ := userSrv.GetAsset(seller.Id)
-		ast.Equal(initialPoint+(testItemPrice*cntSuccess), *as.Point)
+		ast.Equal(initialPoint+(testItemPrice*cntSuccess), as.Point)
 	}
 
 	clearAll(repository.GetRepository())

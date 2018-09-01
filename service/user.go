@@ -53,7 +53,7 @@ func (us *userServiceImpl) GetAsset(userId string) (*model.Asset, error) {
 func (us *userServiceImpl) Start() (*model.Session, error) {
 	u := model.DefaultUser()
 	s := model.DefaultSession()
-	s.UserId = &u.Id
+	s.UserId = u.Id
 
 	tx := us.repo.Transaction()
 	if err := tx.Insert(u).Insert(s).Commit(); err != nil {
@@ -67,10 +67,10 @@ func (us *userServiceImpl) Login(email, password string) (*model.Session, error)
 	if err != nil {
 		return nil, err
 	}
-	if !*a.Enabled {
+	if !a.Enabled {
 		return nil, fmt.Errorf("not enabled")
 	}
-	if !correctPassword(*a.Password, password) {
+	if !correctPassword(a.Password, password) {
 		return nil, fmt.Errorf("invalid password")
 	}
 
@@ -87,7 +87,7 @@ func (us *userServiceImpl) PublishAuth(userID, email, password string) (*model.A
 
 	exist, _ := us.userRepo.FindAuthByEmail(email)
 	if exist != nil {
-		if *exist.Enabled {
+		if exist.Enabled {
 			return nil, fmt.Errorf("email already enabled")
 		}
 		tx.Delete(exist)
@@ -95,9 +95,9 @@ func (us *userServiceImpl) PublishAuth(userID, email, password string) (*model.A
 
 	encrypted := encrypt(password)
 	a := model.DefaultAuthentication()
-	a.UserId = &userID
-	a.EMail = &email
-	a.Password = &encrypted
+	a.UserId = userID
+	a.EMail = email
+	a.Password = encrypted
 	if err := tx.Insert(a).Commit(); err != nil {
 		return nil, err
 	}
@@ -109,17 +109,15 @@ func (us *userServiceImpl) EnableAuth(token string) error {
 	if err != nil {
 		return err
 	}
-	if *au.Enabled {
+	if au.Enabled {
 		return fmt.Errorf("already enabled")
 	}
-	tr := true
-	t := time.Now()
-	au.Enabled = &tr
-	au.UpdatedAt = &t
+	au.Enabled = true
+	au.UpdatedAt = time.Now()
 
 	as := model.DefaultAsset()
 	as.UserId = au.UserId
-	as.Point = &initialPoint
+	as.Point = initialPoint
 
 	tx := us.repo.Transaction()
 	return tx.Update(au).Insert(as).Commit()

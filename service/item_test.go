@@ -33,11 +33,10 @@ func TestCreateItem(t *testing.T) {
 
 	u, _, _, _ := createPerfectUser()
 	newItem := model.DefaultItem()
-	text := "hoge"
-	newItem.UserId = &u.Id
-	newItem.Label = &text
-	newItem.Description = &text
-	newItem.Price = &testItemPrice
+	newItem.UserId = u.Id
+	newItem.Label = "label"
+	newItem.Description = "description"
+	newItem.Price = testItemPrice
 
 	// invalid user
 	{
@@ -95,8 +94,7 @@ func TestUpdateItem(t *testing.T) {
 			errDeal <- e
 		}()
 		go func() {
-			price := 5000
-			i.Price = &price
+			i.Price = 5000
 			_, e := itemSrv.UpdateItem(i.Id, i)
 			errUpdate <- e
 		}()

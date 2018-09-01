@@ -59,7 +59,7 @@ func createAnonymousUser() *model.User {
 
 func createSession(userId string) *model.Session {
 	s := model.DefaultSession()
-	s.UserId = &userId
+	s.UserId = userId
 	repo.Insert(s)
 	return s
 }
@@ -80,18 +80,18 @@ func createAuthentication(u *model.User, enable bool) *model.Authentication {
 	au := model.DefaultAuthentication()
 	email := createEmail(u.Id)
 	encrypted := encrypt(testAuthPass)
-	au.UserId = &u.Id
-	au.EMail = &email
-	au.Password = &encrypted
-	au.Enabled = &enable
+	au.UserId = u.Id
+	au.EMail = email
+	au.Password = encrypted
+	au.Enabled = enable
 	repo.Insert(au)
 	return au
 }
 
 func createAsset(u *model.User) *model.Asset {
 	as := model.DefaultAsset()
-	as.UserId = &u.Id
-	as.Point = &initialPoint
+	as.UserId = u.Id
+	as.Point = initialPoint
 	repo.Insert(as)
 	return as
 }
@@ -100,10 +100,10 @@ func createItem(u *model.User, status string) *model.Item {
 	i := model.DefaultItem()
 	label := "label"
 	price := testItemPrice
-	i.UserId = &u.Id
-	i.Label = &label
-	i.Price = &price
-	i.Status = &status
+	i.UserId = u.Id
+	i.Label = label
+	i.Price = price
+	i.Status = status
 	repo.Insert(i)
 	return i
 }
