@@ -13,6 +13,9 @@ import (
 
 var (
 	repo repository.Repo
+
+	testAuthPass  = "password"
+	testItemPrice = 100
 )
 
 func TestMain(m *testing.M) {
@@ -54,23 +57,33 @@ func createAnonymousUser() *model.User {
 	return u
 }
 
+func createSession(userId string) *model.Session {
+	s := model.DefaultSession()
+	s.UserId = &userId
+	repo.Insert(s)
+	return s
+}
+
 func createPerfectUser() (*model.User, *model.Authentication, *model.Asset, *model.Item) {
 	u := createAnonymousUser()
-	au := createAuthentication(u)
+	au := createAuthentication(u, true)
 	as := createAsset(u)
 	i := createItem(u, model.ItemStatusSold)
 	return u, au, as, i
 }
 
-func createAuthentication(u *model.User) *model.Authentication {
+func createEmail(userId string) string {
+	return fmt.Sprintf("%s@test.com", userId)
+}
+
+func createAuthentication(u *model.User, enable bool) *model.Authentication {
 	au := model.DefaultAuthentication()
-	email := fmt.Sprintf("%s@test.com", u.Id)
-	pass := "hogehoge"
-	t := true
+	email := createEmail(u.Id)
+	encrypted := encrypt(testAuthPass)
 	au.UserId = &u.Id
 	au.EMail = &email
-	au.Password = &pass
-	au.Enabled = &t
+	au.Password = &encrypted
+	au.Enabled = &enable
 	repo.Insert(au)
 	return au
 }
@@ -86,7 +99,7 @@ func createAsset(u *model.User) *model.Asset {
 func createItem(u *model.User, status string) *model.Item {
 	i := model.DefaultItem()
 	label := "label"
-	price := 100
+	price := testItemPrice
 	i.UserId = &u.Id
 	i.Label = &label
 	i.Price = &price
