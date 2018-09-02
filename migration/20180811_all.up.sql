@@ -35,7 +35,7 @@ CREATE TABLE assets (
 );
 CREATE INDEX assets_created_at_key ON assets (created_at);
 
-CREATE TYPE item_status AS ENUM ('notsold', 'sold', 'soldout');
+CREATE TYPE item_status AS ENUM ('notsale', 'sale', 'sold');
 
 CREATE TABLE items (
   id CHAR(10) PRIMARY KEY,

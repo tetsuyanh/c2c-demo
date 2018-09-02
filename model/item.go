@@ -5,9 +5,9 @@ import (
 )
 
 var (
-	ItemStatusNotSold = "notsold"
+	ItemStatusNotSale = "notsale"
+	ItemStatusSale    = "sale"
 	ItemStatusSold    = "sold"
-	ItemStatusSoldOut = "soldout"
 )
 
 type Item struct {
@@ -33,7 +33,7 @@ func DefaultItem() *Item {
 		"",
 		"",
 		0,
-		ItemStatusNotSold,
+		ItemStatusNotSale,
 		t,
 		t,
 		0,

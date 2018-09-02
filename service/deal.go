@@ -52,10 +52,10 @@ func (ds *dealServiceImpl) Establish(itemId, buyerId string) (*model.Deal, error
 	tx := ds.repo.Transaction()
 
 	i := obj.(*model.Item)
-	if i.Status != model.ItemStatusSold {
+	if i.Status != model.ItemStatusSale {
 		return nil, fmt.Errorf("item invalid status")
 	}
-	i.Status = model.ItemStatusSoldOut
+	i.Status = model.ItemStatusSold
 	tx.Update(i)
 
 	d := model.DefaultDeal()

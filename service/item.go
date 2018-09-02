@@ -67,8 +67,9 @@ func (is *itemServiceImpl) UpdateItem(id, userId string, req *model.Item) (*mode
 	if i.UserId != userId {
 		return nil, fmt.Errorf("forbidden")
 	}
-	// updating status 'soldout' is allowed for dealService
-	if i.Status == model.ItemStatusSoldOut || req.Status == model.ItemStatusSoldOut {
+	// cannnot update item already sold
+	// cannnot make status sold by mylsef ,is is allowed for dealService
+	if i.Status == model.ItemStatusSold || req.Status == model.ItemStatusSold {
 		return nil, fmt.Errorf("not stauts to update")
 	}
 
@@ -103,7 +104,7 @@ func (is *itemServiceImpl) DeleteItem(id, userId string) error {
 		return fmt.Errorf("forbidden")
 	}
 	// cannnot delete item already sold
-	if i.Status == model.ItemStatusSoldOut {
+	if i.Status == model.ItemStatusSold {
 		return fmt.Errorf("not stauts to delete")
 	}
 

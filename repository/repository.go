@@ -90,6 +90,7 @@ func (r *repoImpl) Get(i interface{}, id string) (interface{}, error) {
 		return nil, err
 	} else if obj == nil && err == nil {
 		// when row is not found, gorp returns nil, nil
+		// see https://github.com/go-gorp/gorp/blob/master/gorp.go#L428
 		return nil, fmt.Errorf("not found")
 	}
 	return obj, err

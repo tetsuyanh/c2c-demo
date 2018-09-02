@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/tetsuyanh/c2c-demo/model"
-	"github.com/tetsuyanh/c2c-demo/repository"
 )
 
 func TestGetDealAsSeller(t *testing.T) {
@@ -28,7 +27,7 @@ func TestEstablish(t *testing.T) {
 	seller, _, _, _ := createPerfectUser()
 	items := make([]*model.Item, parallel)
 	for idx, _ := range items {
-		i := createItem(seller, model.ItemStatusSold)
+		i := createItem(seller, model.ItemStatusSale)
 		items[idx] = i
 	}
 	buyers := make([]*model.User, parallel)
@@ -46,7 +45,7 @@ func TestEstablish(t *testing.T) {
 
 	// invalid item status
 	{
-		itemSoldout := createItem(seller, model.ItemStatusSoldOut)
+		itemSoldout := createItem(seller, model.ItemStatusSold)
 		o, e := dealSrv.Establish(itemSoldout.Id, buyers[0].Id)
 		ast.Nil(o)
 		ast.NotNil(e)
@@ -88,6 +87,4 @@ func TestEstablish(t *testing.T) {
 		as, _ := userSrv.GetAsset(seller.Id)
 		ast.Equal(initialPoint+(testItemPrice*cntSuccess), as.Point)
 	}
-
-	clearAll(repository.GetRepository())
 }

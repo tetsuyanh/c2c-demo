@@ -68,7 +68,7 @@ func createPerfectUser() (*model.User, *model.Authentication, *model.Asset, *mod
 	u := createAnonymousUser()
 	au := createAuthentication(u, true)
 	as := createAsset(u)
-	i := createItem(u, model.ItemStatusSold)
+	i := createItem(u, model.ItemStatusSale)
 	return u, au, as, i
 }
 
