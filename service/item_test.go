@@ -39,26 +39,35 @@ func TestGetItem(t *testing.T) {
 func TestCreateItem(t *testing.T) {
 	ast := assert.New(t)
 	itemSrv := GetItemService()
-
 	u, _, _, _ := createPerfectUser()
-	newItem := model.DefaultItem()
-	newItem.UserId = u.Id
-	newItem.Label = "label"
-	newItem.Description = "description"
-	newItem.Price = testItemPrice
 
-	// invalid user
+	// invalid model
 	{
+		i := model.DefaultItem()
+		o, e := itemSrv.CreateItem(u.Id, i)
+		ast.Nil(o)
+		ast.NotNil(e)
+	}
 
-		i, e := itemSrv.CreateItem("hogehogeId", newItem)
-		ast.Nil(i)
+	// invalid relation
+	{
+		i := model.DefaultItem()
+		i.Label = "label"
+		i.Description = "description"
+		i.Price = testItemPrice
+		o, e := itemSrv.CreateItem("hogehogeId", i)
+		ast.Nil(o)
 		ast.NotNil(e)
 	}
 
 	// success
 	{
-		i, e := itemSrv.CreateItem(u.Id, newItem)
-		ast.NotNil(i)
+		i := model.DefaultItem()
+		i.Label = "label"
+		i.Description = "description"
+		i.Price = testItemPrice
+		o, e := itemSrv.CreateItem(u.Id, i)
+		ast.NotNil(o)
 		ast.Nil(e)
 	}
 }
@@ -73,6 +82,15 @@ func TestUpdateItem(t *testing.T) {
 	{
 		i := createItem(u, model.ItemStatusSale)
 		o, e := itemSrv.UpdateItem("hogehogeId", u.Id, i)
+		ast.Nil(o)
+		ast.NotNil(e)
+	}
+
+	// invalid model
+	{
+		i := createItem(u, model.ItemStatusSale)
+		i.Price = -100
+		o, e := itemSrv.UpdateItem(i.Id, u.Id, i)
 		ast.Nil(o)
 		ast.NotNil(e)
 	}

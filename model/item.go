@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -38,4 +39,22 @@ func DefaultItem() *Item {
 		t,
 		0,
 	}
+}
+
+func (i *Item) Verify() error {
+	if i.UserId == "" {
+		return fmt.Errorf("require userId")
+	}
+	if i.Label == "" {
+		return fmt.Errorf("require label")
+	}
+	if i.Price <= 0 {
+		return fmt.Errorf("price should be positive number")
+	}
+	if i.Status != ItemStatusNotSale &&
+		i.Status != ItemStatusSale &&
+		i.Status != ItemStatusSold {
+		return fmt.Errorf("invalid status")
+	}
+	return nil
 }

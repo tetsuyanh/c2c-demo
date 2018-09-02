@@ -36,10 +36,14 @@ func GetItemService() ItemService {
 
 func (is *itemServiceImpl) CreateItem(userId string, req *model.Item) (*model.Item, error) {
 	i := model.DefaultItem()
+	// limited fields to update by request
 	i.UserId = userId
 	i.Label = req.Label
 	i.Description = req.Description
 	i.Price = req.Price
+	if err := i.Verify(); err != nil {
+		return nil, err
+	}
 	if err := is.repo.Insert(i); err != nil {
 		return nil, err
 	}
@@ -64,16 +68,8 @@ func (is *itemServiceImpl) UpdateItem(id, userId string, req *model.Item) (*mode
 		return nil, err
 	}
 	i := obj.(*model.Item)
-	if i.UserId != userId {
-		return nil, fmt.Errorf("forbidden")
-	}
-	// cannnot update item already sold
-	// cannnot make status sold by mylsef ,is is allowed for dealService
-	if i.Status == model.ItemStatusSold || req.Status == model.ItemStatusSold {
-		return nil, fmt.Errorf("not stauts to update")
-	}
 
-	// limited fields to update
+	// limited fields to update by request
 	if req.Label != "" {
 		i.Label = req.Label
 	}
@@ -86,7 +82,19 @@ func (is *itemServiceImpl) UpdateItem(id, userId string, req *model.Item) (*mode
 	if req.Status != "" {
 		i.Status = req.Status
 	}
-	req.UpdatedAt = time.Now()
+	i.UpdatedAt = time.Now()
+	if err := i.Verify(); err != nil {
+		return nil, err
+	}
+
+	if i.UserId != userId {
+		return nil, fmt.Errorf("forbidden")
+	}
+	// cannnot update item already sold
+	// cannnot make status sold by mylsef ,is is allowed for dealService
+	if i.Status == model.ItemStatusSold || req.Status == model.ItemStatusSold {
+		return nil, fmt.Errorf("not stauts to update")
+	}
 
 	if err := is.repo.Update(i); err != nil {
 		return nil, err
