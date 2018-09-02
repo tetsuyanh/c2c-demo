@@ -37,10 +37,16 @@ func GetDealService() DealService {
 }
 
 func (ds *dealServiceImpl) GetDealAsSeller(opt *repository.Option) ([]*model.Deal, error) {
+	if opt.GetUserId() == "" {
+		return nil, fmt.Errorf("require option userId")
+	}
 	return ds.dealRepo.SelectDealAsSeller(opt)
 }
 
 func (ds *dealServiceImpl) GetDealAsBuyer(opt *repository.Option) ([]*model.Deal, error) {
+	if opt.GetUserId() == "" {
+		return nil, fmt.Errorf("require option userId")
+	}
 	return ds.dealRepo.SelectDealAsBuyer(opt)
 }
 

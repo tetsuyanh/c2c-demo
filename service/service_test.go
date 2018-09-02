@@ -107,3 +107,14 @@ func createItem(userId string, status string) *model.Item {
 	repo.Insert(i)
 	return i
 }
+
+func createDeal(sellerId, buyerId string) *model.Deal {
+	i := createItem(sellerId, model.ItemStatusSale)
+	repo.Insert(i)
+	d := model.DefaultDeal()
+	d.ItemId = i.Id
+	d.SellerId = sellerId
+	d.BuyerId = buyerId
+	repo.Insert(d)
+	return d
+}

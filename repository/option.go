@@ -23,30 +23,34 @@ func DefaultOption() *Option {
 	}
 }
 
-func (p *Option) SetUserId(userId string) {
-	p.userId = userId
+func (o *Option) GetUserId() string {
+	return o.userId
 }
 
-func (p *Option) SetLimit(limit int) {
+func (o *Option) SetUserId(userId string) {
+	o.userId = userId
+}
+
+func (o *Option) SetLimit(limit int) {
 	if limit < limitMin {
 		limit = limitMin
 	} else if limit > limitMax {
 		limit = limitMax
 	}
-	p.limit = limit
+	o.limit = limit
 }
 
-func (p *Option) SetOffset(offset int) {
+func (o *Option) SetOffset(offset int) {
 	if offset < offsetMin {
 		offset = offsetMin
 	}
-	p.offset = offset
+	o.offset = offset
 }
 
-func (p *Option) Map() map[string]interface{} {
+func (o *Option) Map() map[string]interface{} {
 	return map[string]interface{}{
-		"userId": p.userId,
-		"limit":  p.limit,
-		"offset": p.offset,
+		"userId": o.userId,
+		"limit":  o.limit,
+		"offset": o.offset,
 	}
 }
