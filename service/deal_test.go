@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"sync"
 	"testing"
 
@@ -40,8 +39,6 @@ func TestGetDealAsSeller(t *testing.T) {
 	d2 := createDeal(seller.Id, buyer.Id)
 	d3 := createDeal(seller.Id, buyer.Id)
 
-	fmt.Println("seller: ", seller.Id)
-
 	// success get=2, by offset=0, limit=2
 	{
 		opt := repository.DefaultOption()
@@ -51,8 +48,8 @@ func TestGetDealAsSeller(t *testing.T) {
 		ds, e := dealSrv.GetDealAsSeller(opt)
 		ast.NotNil(ds)
 		if ast.Equal(2, len(ds)) {
-			ast.Equal(ds[0].ItemId, d3.ItemId)
-			ast.Equal(ds[1].ItemId, d2.ItemId)
+			ast.Equal(d3.Id, ds[0].Id)
+			ast.Equal(d2.Id, ds[1].Id)
 		}
 		ast.Nil(e)
 	}
@@ -66,7 +63,7 @@ func TestGetDealAsSeller(t *testing.T) {
 		ds, e := dealSrv.GetDealAsSeller(opt)
 		ast.NotNil(ds)
 		if ast.Equal(1, len(ds)) {
-			ast.Equal(ds[0].ItemId, d1.ItemId)
+			ast.Equal(d1.Id, ds[0].Id)
 		}
 		ast.Nil(e)
 	}

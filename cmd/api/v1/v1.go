@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,8 +13,9 @@ import (
 
 const (
 	headerSessionToken = "X-C2c-Session-Token"
-	requestUserId      = "requestUserId"
-	requesSelectOption = "requestSelectOption"
+	sessionUserId      = "sessioUserId"
+	authedUserId       = "authedUserId"
+	selectOption       = "selectOption"
 )
 
 var (
@@ -39,10 +41,15 @@ func Router(e *gin.Engine) {
 		// v1.Get("/items/:id", handlerGetItemOne)
 
 		// after here, require session to identify user
-		v1.Use(setAuthenticatedUserID)
+		v1.Use(setSessionUserId)
 		v1.POST("/auths/publish", handlerPostAuthPublish)
 		v1.POST("/auths/login", handlerPostAuthLogin)
+
+		// after here, require session of authenticated user
+		v1.Use(setAuthenticatedUserId)
 		v1.POST("/items", handlerPostItem)
+		v1.GET("/items", setSelectOption, handlerGetItems)
+		v1.GET("/item/:id", handlerGetItem)
 		v1.PUT("/items/:id", handlerPutItem)
 		v1.DELETE("/items/:id", handlerDeleteItem)
 		v1.GET("/deals/seller", setSelectOption, handlerGetDealAsSeller)
@@ -51,20 +58,33 @@ func Router(e *gin.Engine) {
 	}
 }
 
-func setAuthenticatedUserID(c *gin.Context) {
+func setSessionUserId(c *gin.Context) {
 	u, err := userSrv.GetUser(c.GetHeader(headerSessionToken))
 	if err != nil {
 		c.AbortWithError(http.StatusUnauthorized, err)
 		return
 	}
-	c.Set(requestUserId, u.Id)
+	c.Set(sessionUserId, u.Id)
+}
+
+// expect called after setSessionUserId, use sessionUserId
+func setAuthenticatedUserId(c *gin.Context) {
+	a, err := userSrv.GetAuthentication(c.GetString(sessionUserId))
+	if err != nil {
+		c.AbortWithError(http.StatusUnauthorized, err)
+		return
+	}
+	if !a.Enabled {
+		c.AbortWithError(http.StatusUnauthorized, fmt.Errorf("not enabled"))
+	}
+	c.Set(authedUserId, a.UserId)
 }
 
 func setSelectOption(c *gin.Context) {
 	opt := repository.DefaultOption()
 
 	// keys
-	opt.SetUserId(c.GetString(requestUserId))
+	opt.SetUserId(c.GetString(authedUserId))
 
 	// conditions
 	limit := c.Query("limit")
@@ -86,5 +106,5 @@ func setSelectOption(c *gin.Context) {
 		opt.SetOffset(o)
 	}
 
-	c.Set(requesSelectOption, opt)
+	c.Set(selectOption, opt)
 }

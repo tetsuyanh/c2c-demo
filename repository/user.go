@@ -17,6 +17,7 @@ var (
 type (
 	UserRepo interface {
 		FindUserBySettionToken(token string) (*model.User, error)
+		FindAuthByUserId(userId string) (*model.Authentication, error)
 		FindAuthByEmail(email string) (*model.Authentication, error)
 		FindAuthByToken(token string) (*model.Authentication, error)
 		FindAssetByUserId(userId string) (*model.Asset, error)
@@ -44,6 +45,21 @@ func (ur *userRepoImpl) FindUserBySettionToken(token string) (*model.User, error
 		where
 			s.token = $1
 		`, token); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (ur *userRepoImpl) FindAuthByUserId(userId string) (*model.Authentication, error) {
+	u := &model.Authentication{}
+	if err := repo.dbMap.SelectOne(u, `
+		select
+			*
+		from
+			authentications
+		where
+			userId = $1
+		`, userId); err != nil {
 		return nil, err
 	}
 	return u, nil

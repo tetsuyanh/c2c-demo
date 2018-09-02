@@ -10,23 +10,23 @@ import (
 )
 
 func handlerGetDealAsSeller(c *gin.Context) {
-	opt, _ := c.Get(requesSelectOption)
-	d, err := dealSrv.GetDealAsSeller(opt.(*repository.Option))
+	obj, _ := c.Get(selectOption)
+	ds, err := dealSrv.GetDealAsSeller(obj.(*repository.Option))
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
-	c.JSON(http.StatusOK, d)
+	c.JSON(http.StatusOK, ds)
 }
 
 func handlerGetDealAsBuyer(c *gin.Context) {
-	opt, _ := c.Get(requesSelectOption)
-	d, err := dealSrv.GetDealAsBuyer(opt.(*repository.Option))
+	obj, _ := c.Get(selectOption)
+	ds, err := dealSrv.GetDealAsBuyer(obj.(*repository.Option))
 	if err != nil {
 		c.AbortWithError(http.StatusNotFound, err)
 		return
 	}
-	c.JSON(http.StatusOK, d)
+	c.JSON(http.StatusOK, ds)
 }
 
 func handlerPostDeal(c *gin.Context) {
@@ -35,7 +35,7 @@ func handlerPostDeal(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	d, err := dealSrv.Establish(req.ItemId, c.GetString(requestUserId))
+	d, err := dealSrv.Establish(req.ItemId, c.GetString(authedUserId))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

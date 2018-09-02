@@ -6,35 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/tetsuyanh/c2c-demo/model"
+	"github.com/tetsuyanh/c2c-demo/repository"
 )
-
-func TestGetItem(t *testing.T) {
-	ast := assert.New(t)
-	itemSrv := GetItemService()
-	u, _, _, i := createPerfectUser()
-
-	// invalid itemId
-	{
-		o, e := itemSrv.GetItem("hogehogeId", u.Id)
-		ast.Nil(o)
-		ast.NotNil(e)
-	}
-
-	// invalid userId
-	{
-		other, _, _, _ := createPerfectUser()
-		o, e := itemSrv.GetItem(i.Id, other.Id)
-		ast.Nil(o)
-		ast.NotNil(e)
-	}
-
-	// success
-	{
-		o, e := itemSrv.GetItem(i.Id, u.Id)
-		ast.NotNil(o)
-		ast.Nil(e)
-	}
-}
 
 func TestCreateItem(t *testing.T) {
 	ast := assert.New(t)
@@ -67,6 +40,93 @@ func TestCreateItem(t *testing.T) {
 		i.Description = "description"
 		i.Price = testItemPrice
 		o, e := itemSrv.CreateItem(u.Id, i)
+		ast.NotNil(o)
+		ast.Nil(e)
+	}
+}
+
+func TestGetItems(t *testing.T) {
+	ast := assert.New(t)
+	itemSrv := GetItemService()
+	u := createAnonymousUser()
+	createAuthentication(u.Id, true)
+
+	// invalid userId
+	{
+		opt := repository.DefaultOption()
+		is, e := itemSrv.GetItems(opt)
+		ast.Nil(is)
+		ast.NotNil(e)
+	}
+
+	// success empty
+	{
+		opt := repository.DefaultOption()
+		opt.SetUserId(u.Id)
+		is, e := itemSrv.GetItems(opt)
+		ast.NotNil(is)
+		ast.Equal(0, len(is))
+		ast.Nil(e)
+	}
+
+	// create 3 items each status
+	i1 := createItem(u.Id, model.ItemStatusNotSale)
+	i2 := createItem(u.Id, model.ItemStatusSale)
+	i3 := createItem(u.Id, model.ItemStatusSold)
+
+	// success get=2, by offset=0, limit=2
+	{
+		opt := repository.DefaultOption()
+		opt.SetUserId(u.Id)
+		opt.SetOffset(0)
+		opt.SetLimit(2)
+		is, e := itemSrv.GetItems(opt)
+		ast.NotNil(is)
+		if ast.Equal(2, len(is)) {
+			ast.Equal(i3.Id, is[0].Id)
+			ast.Equal(i2.Id, is[1].Id)
+		}
+		ast.Nil(e)
+	}
+
+	// success get=1, by offset=2, limit=2
+	{
+		opt := repository.DefaultOption()
+		opt.SetUserId(u.Id)
+		opt.SetOffset(2)
+		opt.SetLimit(2)
+		is, e := itemSrv.GetItems(opt)
+		ast.NotNil(is)
+		if ast.Equal(1, len(is)) {
+			ast.Equal(i1.Id, is[0].Id)
+		}
+		ast.Nil(e)
+	}
+}
+
+func TestGetItem(t *testing.T) {
+	ast := assert.New(t)
+	itemSrv := GetItemService()
+	u, _, _, i := createPerfectUser()
+
+	// invalid itemId
+	{
+		o, e := itemSrv.GetItem("hogehogeId", u.Id)
+		ast.Nil(o)
+		ast.NotNil(e)
+	}
+
+	// invalid userId
+	{
+		other, _, _, _ := createPerfectUser()
+		o, e := itemSrv.GetItem(i.Id, other.Id)
+		ast.Nil(o)
+		ast.NotNil(e)
+	}
+
+	// success
+	{
+		o, e := itemSrv.GetItem(i.Id, u.Id)
 		ast.NotNil(o)
 		ast.Nil(e)
 	}

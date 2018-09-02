@@ -15,20 +15,25 @@ var (
 type (
 	ItemService interface {
 		CreateItem(userId string, req *model.Item) (*model.Item, error)
+		// GetPublicItems(opt *repository.Option) ([]*model.Item, error)
+		// GetPublicItem(id string) (*model.Item, error)
+		GetItems(opt *repository.Option) ([]*model.Item, error)
 		GetItem(id, userId string) (*model.Item, error)
 		UpdateItem(id, userId string, req *model.Item) (*model.Item, error)
 		DeleteItem(id, userId string) error
 	}
 
 	itemServiceImpl struct {
-		repo repository.Repo
+		repo     repository.Repo
+		itemRepo repository.ItemRepo
 	}
 )
 
 func GetItemService() ItemService {
 	if itemService == nil {
 		itemService = &itemServiceImpl{
-			repo: repository.GetRepository(),
+			repo:     repository.GetRepository(),
+			itemRepo: repository.GetItemRepo(),
 		}
 	}
 	return itemService
@@ -48,6 +53,13 @@ func (is *itemServiceImpl) CreateItem(userId string, req *model.Item) (*model.It
 		return nil, err
 	}
 	return i, nil
+}
+
+func (is *itemServiceImpl) GetItems(opt *repository.Option) ([]*model.Item, error) {
+	if opt.GetUserId() == "" {
+		return nil, fmt.Errorf("require option userId")
+	}
+	return is.itemRepo.SelectSelfItem(opt)
 }
 
 func (is *itemServiceImpl) GetItem(id, userId string) (*model.Item, error) {
