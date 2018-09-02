@@ -14,7 +14,7 @@ func handlerPostItem(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	i, err := itemSrv.CreateItem(c.GetString(requestUserID), req)
+	i, err := itemSrv.CreateItem(c.GetString(requestUserId), req)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -28,7 +28,7 @@ func handlerPutItem(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	i, err := itemSrv.UpdateItem(c.Param("id"), req)
+	i, err := itemSrv.UpdateItem(c.Param("id"), c.GetString(requestUserId), req)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -37,7 +37,7 @@ func handlerPutItem(c *gin.Context) {
 }
 
 func handlerDeleteItem(c *gin.Context) {
-	if err := itemSrv.DeleteItem(c.Param("id")); err != nil {
+	if err := itemSrv.DeleteItem(c.Param("id"), c.GetString(requestUserId)); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}

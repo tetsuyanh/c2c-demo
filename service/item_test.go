@@ -11,17 +11,26 @@ import (
 func TestGetItem(t *testing.T) {
 	ast := assert.New(t)
 	itemSrv := GetItemService()
+	u, _, _, i := createPerfectUser()
 
 	// invalid itemId
 	{
-		o, e := itemSrv.GetItem("hogehogeId")
+		o, e := itemSrv.GetItem("hogehogeId", u.Id)
 		ast.Nil(o)
 		ast.NotNil(e)
 	}
+
+	// invalid userId
+	{
+		other, _, _, _ := createPerfectUser()
+		o, e := itemSrv.GetItem(i.Id, other.Id)
+		ast.Nil(o)
+		ast.NotNil(e)
+	}
+
 	// success
 	{
-		_, _, _, i := createPerfectUser()
-		o, e := itemSrv.GetItem(i.Id)
+		o, e := itemSrv.GetItem(i.Id, u.Id)
 		ast.NotNil(o)
 		ast.Nil(e)
 	}
@@ -45,6 +54,7 @@ func TestCreateItem(t *testing.T) {
 		ast.Nil(i)
 		ast.NotNil(e)
 	}
+
 	// success
 	{
 		i, e := itemSrv.CreateItem(u.Id, newItem)
@@ -62,7 +72,16 @@ func TestUpdateItem(t *testing.T) {
 	// invalid itemId
 	{
 		i := createItem(u, model.ItemStatusSold)
-		o, e := itemSrv.UpdateItem("hogehogeId", i)
+		o, e := itemSrv.UpdateItem("hogehogeId", u.Id, i)
+		ast.Nil(o)
+		ast.NotNil(e)
+	}
+
+	// invalid userId
+	{
+		other := createAnonymousUser()
+		i := createItem(u, model.ItemStatusSold)
+		o, e := itemSrv.UpdateItem(i.Id, other.Id, i)
 		ast.Nil(o)
 		ast.NotNil(e)
 	}
@@ -70,7 +89,7 @@ func TestUpdateItem(t *testing.T) {
 	// invalid item status
 	{
 		i := createItem(u, model.ItemStatusSoldOut)
-		o, e := itemSrv.UpdateItem(i.Id, i)
+		o, e := itemSrv.UpdateItem(i.Id, u.Id, i)
 		ast.Nil(o)
 		ast.NotNil(e)
 	}
@@ -78,7 +97,7 @@ func TestUpdateItem(t *testing.T) {
 	// success
 	{
 		i := createItem(u, model.ItemStatusSold)
-		o, e := itemSrv.UpdateItem(i.Id, i)
+		o, e := itemSrv.UpdateItem(i.Id, u.Id, i)
 		ast.NotNil(o)
 		ast.Nil(e)
 	}
@@ -95,7 +114,7 @@ func TestUpdateItem(t *testing.T) {
 		}()
 		go func() {
 			i.Price = 5000
-			_, e := itemSrv.UpdateItem(i.Id, i)
+			_, e := itemSrv.UpdateItem(i.Id, u.Id, i)
 			errUpdate <- e
 		}()
 		// the one should be success, the other should be fail
@@ -115,20 +134,27 @@ func TestDeleteItem(t *testing.T) {
 
 	// invalid itemId
 	{
-		e := itemSrv.DeleteItem("hogehogeId")
+		e := itemSrv.DeleteItem("hogehogeId", u.Id)
+		ast.NotNil(e)
+	}
+
+	// invalid userId
+	{
+		other, _, _, _ := createPerfectUser()
+		e := itemSrv.DeleteItem(i.Id, other.Id)
 		ast.NotNil(e)
 	}
 
 	// invalid status
 	{
 		itemSoldout := createItem(u, model.ItemStatusSoldOut)
-		e := itemSrv.DeleteItem(itemSoldout.Id)
+		e := itemSrv.DeleteItem(itemSoldout.Id, u.Id)
 		ast.NotNil(e)
 	}
 
 	// success
 	{
-		e := itemSrv.DeleteItem(i.Id)
+		e := itemSrv.DeleteItem(i.Id, u.Id)
 		ast.Nil(e)
 	}
 }

@@ -12,7 +12,7 @@ import (
 
 const (
 	headerSessionToken = "X-C2c-Session-Token"
-	requestUserID      = "requestUserID"
+	requestUserId      = "requestUserId"
 	requesSelectOption = "requestSelectOption"
 )
 
@@ -57,14 +57,14 @@ func setAuthenticatedUserID(c *gin.Context) {
 		c.AbortWithError(http.StatusUnauthorized, err)
 		return
 	}
-	c.Set(requestUserID, u.Id)
+	c.Set(requestUserId, u.Id)
 }
 
 func setSelectOption(c *gin.Context) {
 	opt := repository.DefaultOption()
 
 	// keys
-	opt.SetUserId(c.GetString(requestUserID))
+	opt.SetUserId(c.GetString(requestUserId))
 
 	// conditions
 	limit := c.Query("limit")
