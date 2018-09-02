@@ -75,7 +75,6 @@ func TestGetDealAsBuyer(t *testing.T) {
 
 func TestEstablish(t *testing.T) {
 	ast := assert.New(t)
-	// userSrv := GetUserService()
 	dealSrv := GetDealService()
 
 	// perfect data of 1 seller has multiple items and multiple buyers
@@ -107,13 +106,15 @@ func TestEstablish(t *testing.T) {
 		ast.NotNil(e)
 	}
 
-	// invalid buyterId
+	// invalid buyerId
 	{
 		o, e := dealSrv.Establish(items[0].Id, "hogehogeId")
 		ast.Nil(o)
 		ast.NotNil(e)
 	}
 
+	// FIXME: test become lock...
+	// userSrv := GetUserService()
 	// when seller's items are purchased at the same time
 	{
 		// wg := new(sync.WaitGroup)
