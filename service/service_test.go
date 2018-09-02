@@ -66,9 +66,9 @@ func createSession(userId string) *model.Session {
 
 func createPerfectUser() (*model.User, *model.Authentication, *model.Asset, *model.Item) {
 	u := createAnonymousUser()
-	au := createAuthentication(u, true)
-	as := createAsset(u)
-	i := createItem(u, model.ItemStatusSale)
+	au := createAuthentication(u.Id, true)
+	as := createAsset(u.Id)
+	i := createItem(u.Id, model.ItemStatusSale)
 	return u, au, as, i
 }
 
@@ -76,11 +76,11 @@ func createEmail(userId string) string {
 	return fmt.Sprintf("%s@test.com", userId)
 }
 
-func createAuthentication(u *model.User, enable bool) *model.Authentication {
+func createAuthentication(userId string, enable bool) *model.Authentication {
 	au := model.DefaultAuthentication()
-	email := createEmail(u.Id)
+	email := createEmail(userId)
 	encrypted := encrypt(testAuthPass)
-	au.UserId = u.Id
+	au.UserId = userId
 	au.EMail = email
 	au.Password = encrypted
 	au.Enabled = enable
@@ -88,19 +88,19 @@ func createAuthentication(u *model.User, enable bool) *model.Authentication {
 	return au
 }
 
-func createAsset(u *model.User) *model.Asset {
+func createAsset(userId string) *model.Asset {
 	as := model.DefaultAsset()
-	as.UserId = u.Id
+	as.UserId = userId
 	as.Point = initialPoint
 	repo.Insert(as)
 	return as
 }
 
-func createItem(u *model.User, status string) *model.Item {
+func createItem(userId string, status string) *model.Item {
 	i := model.DefaultItem()
 	label := "label"
 	price := testItemPrice
-	i.UserId = u.Id
+	i.UserId = userId
 	i.Label = label
 	i.Price = price
 	i.Status = status

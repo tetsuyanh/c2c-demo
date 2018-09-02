@@ -80,7 +80,7 @@ func TestUpdateItem(t *testing.T) {
 
 	// invalid itemId
 	{
-		i := createItem(u, model.ItemStatusSale)
+		i := createItem(u.Id, model.ItemStatusSale)
 		o, e := itemSrv.UpdateItem("hogehogeId", u.Id, i)
 		ast.Nil(o)
 		ast.NotNil(e)
@@ -88,7 +88,7 @@ func TestUpdateItem(t *testing.T) {
 
 	// invalid model
 	{
-		i := createItem(u, model.ItemStatusSale)
+		i := createItem(u.Id, model.ItemStatusSale)
 		i.Price = -100
 		o, e := itemSrv.UpdateItem(i.Id, u.Id, i)
 		ast.Nil(o)
@@ -98,7 +98,7 @@ func TestUpdateItem(t *testing.T) {
 	// invalid userId
 	{
 		other := createAnonymousUser()
-		i := createItem(u, model.ItemStatusSale)
+		i := createItem(u.Id, model.ItemStatusSale)
 		o, e := itemSrv.UpdateItem(i.Id, other.Id, i)
 		ast.Nil(o)
 		ast.NotNil(e)
@@ -106,7 +106,7 @@ func TestUpdateItem(t *testing.T) {
 
 	// invalid item status
 	{
-		i := createItem(u, model.ItemStatusSold)
+		i := createItem(u.Id, model.ItemStatusSold)
 		o, e := itemSrv.UpdateItem(i.Id, u.Id, i)
 		ast.Nil(o)
 		ast.NotNil(e)
@@ -114,7 +114,7 @@ func TestUpdateItem(t *testing.T) {
 
 	// success
 	{
-		i := createItem(u, model.ItemStatusSale)
+		i := createItem(u.Id, model.ItemStatusSale)
 		o, e := itemSrv.UpdateItem(i.Id, u.Id, i)
 		ast.NotNil(o)
 		ast.Nil(e)
@@ -122,7 +122,7 @@ func TestUpdateItem(t *testing.T) {
 
 	// updating item and dealing occur at the same time
 	{
-		i := createItem(u, model.ItemStatusSale)
+		i := createItem(u.Id, model.ItemStatusSale)
 		buyer, _, _, _ := createPerfectUser()
 		errDeal := make(chan error)
 		errUpdate := make(chan error)
@@ -165,7 +165,7 @@ func TestDeleteItem(t *testing.T) {
 
 	// invalid status
 	{
-		itemSoldout := createItem(u, model.ItemStatusSold)
+		itemSoldout := createItem(u.Id, model.ItemStatusSold)
 		e := itemSrv.DeleteItem(itemSoldout.Id, u.Id)
 		ast.NotNil(e)
 	}

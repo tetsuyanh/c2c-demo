@@ -73,7 +73,7 @@ func TestLogin(t *testing.T) {
 	// not enabled
 	{
 		an := createAnonymousUser()
-		au := createAuthentication(an, false)
+		au := createAuthentication(an.Id, false)
 		s, e := userSrv.Login(au.EMail, testAuthPass)
 		ast.Nil(s)
 		ast.NotNil(e)
@@ -111,7 +111,7 @@ func TestPublishAuth(t *testing.T) {
 	// success, republish when auth is not enable
 	{
 		an := createAnonymousUser()
-		au := createAuthentication(an, false)
+		au := createAuthentication(an.Id, false)
 		s, e := userSrv.PublishAuth(an.Id, au.EMail, testAuthPass)
 		ast.NotNil(s)
 		ast.Nil(e)
@@ -147,7 +147,7 @@ func TestEnableAuth(t *testing.T) {
 	// success
 	{
 		an := createAnonymousUser()
-		au := createAuthentication(an, false)
+		au := createAuthentication(an.Id, false)
 		e := userSrv.EnableAuth(au.Token)
 		ast.Nil(e)
 	}

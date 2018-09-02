@@ -27,7 +27,7 @@ func TestEstablish(t *testing.T) {
 	seller, _, _, _ := createPerfectUser()
 	items := make([]*model.Item, parallel)
 	for idx, _ := range items {
-		i := createItem(seller, model.ItemStatusSale)
+		i := createItem(seller.Id, model.ItemStatusSale)
 		items[idx] = i
 	}
 	buyers := make([]*model.User, parallel)
@@ -45,7 +45,7 @@ func TestEstablish(t *testing.T) {
 
 	// invalid item status
 	{
-		itemSoldout := createItem(seller, model.ItemStatusSold)
+		itemSoldout := createItem(seller.Id, model.ItemStatusSold)
 		o, e := dealSrv.Establish(itemSoldout.Id, buyers[0].Id)
 		ast.Nil(o)
 		ast.NotNil(e)
