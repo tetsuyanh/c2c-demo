@@ -27,6 +27,26 @@ func TestGetUser(t *testing.T) {
 	}
 }
 
+func TestGetAuthentication(t *testing.T) {
+	ast := assert.New(t)
+	userSrv := GetUserService()
+
+	// invalid userId
+	{
+		as, e := userSrv.GetAuthentication("hogehogeId")
+		ast.Nil(as)
+		ast.NotNil(e)
+	}
+
+	// success
+	{
+		pu, _, _, _ := createPerfectUser()
+		au, e := userSrv.GetAuthentication(pu.Id)
+		ast.NotNil(au)
+		ast.Nil(e)
+	}
+}
+
 func TestGetAsset(t *testing.T) {
 	ast := assert.New(t)
 	userSrv := GetUserService()

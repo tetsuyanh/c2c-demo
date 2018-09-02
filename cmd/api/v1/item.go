@@ -23,9 +23,9 @@ func handlerPostItem(c *gin.Context) {
 	c.JSON(http.StatusOK, i)
 }
 
-func handlerGetItems(c *gin.Context) {
+func handlerGetPublicItems(c *gin.Context) {
 	obj, _ := c.Get(selectOption)
-	is, err := itemSrv.GetItems(obj.(*repository.Option))
+	is, err := itemSrv.GetPublicItems(obj.(*repository.Option))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -33,8 +33,27 @@ func handlerGetItems(c *gin.Context) {
 	c.JSON(http.StatusOK, is)
 }
 
-func handlerGetItem(c *gin.Context) {
-	i, err := itemSrv.GetItem(c.Param("id"), c.GetString(authedUserId))
+func handlerGetPublicItem(c *gin.Context) {
+	i, err := itemSrv.GetPublicItem(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, i)
+}
+
+func handlerGetMyItems(c *gin.Context) {
+	obj, _ := c.Get(selectOption)
+	is, err := itemSrv.GetMyItems(obj.(*repository.Option))
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.JSON(http.StatusOK, is)
+}
+
+func handlerGetMyItem(c *gin.Context) {
+	i, err := itemSrv.GetMyItem(c.Param("id"), c.GetString(authedUserId))
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return

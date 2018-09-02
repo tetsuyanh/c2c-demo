@@ -15,10 +15,10 @@ var (
 type (
 	ItemService interface {
 		CreateItem(userId string, req *model.Item) (*model.Item, error)
-		// GetPublicItems(opt *repository.Option) ([]*model.Item, error)
-		// GetPublicItem(id string) (*model.Item, error)
-		GetItems(opt *repository.Option) ([]*model.Item, error)
-		GetItem(id, userId string) (*model.Item, error)
+		GetPublicItems(opt *repository.Option) ([]*model.Item, error)
+		GetPublicItem(id string) (*model.Item, error)
+		GetMyItems(opt *repository.Option) ([]*model.Item, error)
+		GetMyItem(id, userId string) (*model.Item, error)
 		UpdateItem(id, userId string, req *model.Item) (*model.Item, error)
 		DeleteItem(id, userId string) error
 	}
@@ -55,21 +55,25 @@ func (is *itemServiceImpl) CreateItem(userId string, req *model.Item) (*model.It
 	return i, nil
 }
 
-func (is *itemServiceImpl) GetItems(opt *repository.Option) ([]*model.Item, error) {
+func (is *itemServiceImpl) GetPublicItems(opt *repository.Option) ([]*model.Item, error) {
+	return is.itemRepo.SelectPublicItem(opt)
+}
+
+func (is *itemServiceImpl) GetPublicItem(id string) (*model.Item, error) {
+	return is.itemRepo.FindPublicItem(id)
+}
+
+func (is *itemServiceImpl) GetMyItems(opt *repository.Option) ([]*model.Item, error) {
 	if opt.GetUserId() == "" {
 		return nil, fmt.Errorf("require option userId")
 	}
-	return is.itemRepo.SelectSelfItem(opt)
+	return is.itemRepo.SelectMyItem(opt)
 }
 
-func (is *itemServiceImpl) GetItem(id, userId string) (*model.Item, error) {
-	obj, err := is.repo.Get(model.Item{}, id)
+func (is *itemServiceImpl) GetMyItem(id, userId string) (*model.Item, error) {
+	i, err := is.itemRepo.FindMyItem(id, userId)
 	if err != nil {
 		return nil, err
-	}
-	i := obj.(*model.Item)
-	if i.UserId != userId {
-		return nil, fmt.Errorf("forbidden")
 	}
 	return i, nil
 }

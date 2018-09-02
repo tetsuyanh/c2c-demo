@@ -45,7 +45,17 @@ func TestCreateItem(t *testing.T) {
 	}
 }
 
-func TestGetItems(t *testing.T) {
+func TestGetPublicItems(t *testing.T) {
+	// TODO test
+	// other test functions are executed at the same time, so cannot test public items...
+}
+
+func TestGetPublicItem(t *testing.T) {
+	// TODO test
+	// other test functions are executed at the same time, so cannot test public items...
+}
+
+func TestGetMyItems(t *testing.T) {
 	ast := assert.New(t)
 	itemSrv := GetItemService()
 	u := createAnonymousUser()
@@ -54,7 +64,7 @@ func TestGetItems(t *testing.T) {
 	// invalid userId
 	{
 		opt := repository.DefaultOption()
-		is, e := itemSrv.GetItems(opt)
+		is, e := itemSrv.GetMyItems(opt)
 		ast.Nil(is)
 		ast.NotNil(e)
 	}
@@ -63,7 +73,7 @@ func TestGetItems(t *testing.T) {
 	{
 		opt := repository.DefaultOption()
 		opt.SetUserId(u.Id)
-		is, e := itemSrv.GetItems(opt)
+		is, e := itemSrv.GetMyItems(opt)
 		ast.NotNil(is)
 		ast.Equal(0, len(is))
 		ast.Nil(e)
@@ -80,7 +90,7 @@ func TestGetItems(t *testing.T) {
 		opt.SetUserId(u.Id)
 		opt.SetOffset(0)
 		opt.SetLimit(2)
-		is, e := itemSrv.GetItems(opt)
+		is, e := itemSrv.GetMyItems(opt)
 		ast.NotNil(is)
 		if ast.Equal(2, len(is)) {
 			ast.Equal(i3.Id, is[0].Id)
@@ -95,7 +105,7 @@ func TestGetItems(t *testing.T) {
 		opt.SetUserId(u.Id)
 		opt.SetOffset(2)
 		opt.SetLimit(2)
-		is, e := itemSrv.GetItems(opt)
+		is, e := itemSrv.GetMyItems(opt)
 		ast.NotNil(is)
 		if ast.Equal(1, len(is)) {
 			ast.Equal(i1.Id, is[0].Id)
@@ -104,14 +114,14 @@ func TestGetItems(t *testing.T) {
 	}
 }
 
-func TestGetItem(t *testing.T) {
+func TestGetMyItem(t *testing.T) {
 	ast := assert.New(t)
 	itemSrv := GetItemService()
 	u, _, _, i := createPerfectUser()
 
 	// invalid itemId
 	{
-		o, e := itemSrv.GetItem("hogehogeId", u.Id)
+		o, e := itemSrv.GetMyItem("hogehogeId", u.Id)
 		ast.Nil(o)
 		ast.NotNil(e)
 	}
@@ -119,14 +129,14 @@ func TestGetItem(t *testing.T) {
 	// invalid userId
 	{
 		other, _, _, _ := createPerfectUser()
-		o, e := itemSrv.GetItem(i.Id, other.Id)
+		o, e := itemSrv.GetMyItem(i.Id, other.Id)
 		ast.Nil(o)
 		ast.NotNil(e)
 	}
 
 	// success
 	{
-		o, e := itemSrv.GetItem(i.Id, u.Id)
+		o, e := itemSrv.GetMyItem(i.Id, u.Id)
 		ast.NotNil(o)
 		ast.Nil(e)
 	}

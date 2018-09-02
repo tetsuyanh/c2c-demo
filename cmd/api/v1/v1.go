@@ -37,8 +37,8 @@ func Router(e *gin.Engine) {
 		// public
 		v1.POST("/sessions", handlerPostSession)
 		v1.GET("/auths/enable", handlerGetAuthEnable)
-		// v1.GET("/items", handlerGetItems)
-		// v1.Get("/items/:id", handlerGetItemOne)
+		v1.GET("/public_items", setSelectOption, handlerGetPublicItems)
+		v1.GET("/public_items/:id", handlerGetPublicItem)
 
 		// after here, require session to identify user
 		v1.Use(setSessionUserId)
@@ -48,8 +48,8 @@ func Router(e *gin.Engine) {
 		// after here, require session of authenticated user
 		v1.Use(setAuthenticatedUserId)
 		v1.POST("/items", handlerPostItem)
-		v1.GET("/items", setSelectOption, handlerGetItems)
-		v1.GET("/item/:id", handlerGetItem)
+		v1.GET("/items", setSelectOption, handlerGetMyItems)
+		v1.GET("/items/:id", handlerGetMyItem)
 		v1.PUT("/items/:id", handlerPutItem)
 		v1.DELETE("/items/:id", handlerDeleteItem)
 		v1.GET("/deals/seller", setSelectOption, handlerGetDealAsSeller)
