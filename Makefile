@@ -6,6 +6,7 @@ LDFLAGS := -X 'main.version=$(VERSION)' \
 
 setup:
 	go get github.com/golang/dep
+	go install github.com/golang/dep/cmd/dep
 
 install:
 	dep ensure

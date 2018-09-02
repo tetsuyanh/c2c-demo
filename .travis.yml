@@ -1,0 +1,16 @@
+language: go
+sudo: false
+go:
+- '1.10'
+services:
+- postgresql
+addons:
+  postgresql: "9.6"
+before_install:
+- make setup
+- make install
+- ./travis-setup.sh
+before_script:
+- gofmt -d ./cmd ./conf ./model ./repository ./service | xargs -r false
+script:
+- make test
