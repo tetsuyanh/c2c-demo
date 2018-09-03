@@ -82,6 +82,9 @@ func (ds *dealServiceImpl) Establish(itemId, buyerId string) (*model.Deal, error
 		return nil, err
 	}
 	buyerAs.Point = buyerAs.Point - i.Price
+	if buyerAs.Point < 0 {
+		return nil, fmt.Errorf("short of point")
+	}
 	tx.Update(buyerAs)
 
 	if err := tx.Commit(); err != nil {

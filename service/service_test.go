@@ -67,7 +67,7 @@ func createSession(userId string) *model.Session {
 func createPerfectUser() (*model.User, *model.Authentication, *model.Asset, *model.Item) {
 	u := createAnonymousUser()
 	au := createAuthentication(u.Id, true)
-	as := createAsset(u.Id)
+	as := createAsset(u.Id, initialPoint)
 	i := createItem(u.Id, model.ItemStatusSale)
 	return u, au, as, i
 }
@@ -88,10 +88,10 @@ func createAuthentication(userId string, enable bool) *model.Authentication {
 	return au
 }
 
-func createAsset(userId string) *model.Asset {
+func createAsset(userId string, point int) *model.Asset {
 	as := model.DefaultAsset()
 	as.UserId = userId
-	as.Point = initialPoint
+	as.Point = point
 	repo.Insert(as)
 	return as
 }

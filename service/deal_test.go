@@ -113,6 +113,16 @@ func TestEstablish(t *testing.T) {
 		ast.NotNil(e)
 	}
 
+	// short of point
+	{
+		noCasher := createAnonymousUser()
+		createAuthentication(noCasher.Id, true)
+		createAsset(noCasher.Id, 0)
+		o, e := dealSrv.Establish(items[0].Id, noCasher.Id)
+		ast.Nil(o)
+		ast.NotNil(e)
+	}
+
 	// FIXME: test become lock...
 	// userSrv := GetUserService()
 	// when seller's items are purchased at the same time
