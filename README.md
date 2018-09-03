@@ -1,6 +1,13 @@
 # c2c-demo
 
+[![Build Status](https://travis-ci.org/tetsuyanh/c2c-demo.svg?branch=master)](https://travis-ci.org/tetsuyanh/c2c-demo)
+
 c2c demo application by golang
+
+- user scope (anonymous, authencated by email)
+- virtual point
+- item management
+- deal with transaction
 
 ## setup
 for macOS, and you need to install homebrew and golang
