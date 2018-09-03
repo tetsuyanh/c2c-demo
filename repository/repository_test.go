@@ -33,27 +33,32 @@ func TestMain(m *testing.M) {
 func TestUpdate(t *testing.T) {
 	ast := assert.New(t)
 
+	// create user
 	u := model.DefaultUser()
 	err := repo.dbMap.Insert(u)
 	ast.Nil(err)
 
-	a1 := model.DefaultAsset()
-	a1.UserId = u.Id
-	a1.Point = 100
-	err = repo.dbMap.Insert(a1) // Version is now 1
+	// create asset
+	a := model.DefaultAsset()
+	a.UserId = u.Id
+	a.Point = 100
+	err = repo.dbMap.Insert(a)
 	ast.Nil(err)
 
-	obj, err := repo.dbMap.Get(model.Asset{}, a1.Id)
+	// get asset
+	obj, err := repo.dbMap.Get(model.Asset{}, a.Id)
 	ast.NotNil(obj)
 	ast.Nil(err)
 
-	a2 := obj.(*model.Asset)
-	a2.Point = 200
-	_, err = repo.dbMap.Update(a2) // Version is now 2
+	// success, update asset
+	as := obj.(*model.Asset)
+	as.Point = 200
+	_, err = repo.dbMap.Update(as)
 	ast.Nil(err)
 
-	a1.Point = 300
-	count, err := repo.dbMap.Update(a1)
+	// fail, update previous asset
+	a.Point = 300
+	count, err := repo.dbMap.Update(a)
 	ast.NotNil(err)
 	ast.Equal(int64(-1), count)
 }

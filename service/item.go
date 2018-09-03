@@ -41,7 +41,7 @@ func GetItemService() ItemService {
 
 func (is *itemServiceImpl) CreateItem(userId string, req *model.Item) (*model.Item, error) {
 	i := model.DefaultItem()
-	// limited fields to update by request
+	// limited fields to create by request
 	i.UserId = userId
 	i.Label = req.Label
 	i.Description = req.Description
